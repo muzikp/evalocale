@@ -44,21 +44,30 @@ Object.defineProperty(locale, "default", {
     get: () => _default    
 });
 
+/**
+ * Loads a serialized locale bundle into the method's storage.
+ */
 Object.defineProperty(locale, "load", {
     readonly: true,
-    value: function(data) {
-        if(typeof data != "object") {
-            try {
-                data= JSON.parse(data);
-            } catch(e) { 
-                console.error("Failed to read the data.");
-            } finally {
-                return this;
-            }
-        }
+    value: function() {
+        var arg = [...arguments][0];
+        
+
+        
 
     }
 });
+
+Object.defineProperty(locale, "save", {
+    readonly: true,
+    value: function(path){        
+        try {
+
+        } catch(e) {
+
+        }
+    }
+})
 
 Object.defineProperty(locale, "generate", {
     readonly: true,
