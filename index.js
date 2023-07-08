@@ -1,7 +1,9 @@
 var rnd = require("randomstring").generate;
 var numeral = require("numeral");
 var moment = require("moment");
-
+var numeralLocales = require('numeral/locales');
+var x = numeral.locales;
+var locList = require("i18n-locales");
 let _library = {};
 let _metadata = {};
 let _language;
@@ -44,7 +46,21 @@ evalocale.default = evalocale.default;
 
 Object.defineProperty(evalocale, "language", {
     get: () => _language,
-    set: (language) => _language = language
+    set: function(language) {
+        if(locList.indexOf(language) < 0) console.warn(`Language ${language} was not found in the i18n list. This can result in extensions like Numeral.js and Moment.js not working properly. If you want to be sure of proper functioning, adjust the localization of the extensions as necessary.`);
+        if(numeral.locales.hasOwnProperty(language))
+        {
+            debugger;
+        } else
+        {
+            var short = (language.substr(0,2));            
+            if(numeral.locales.hasOwnProperty(short)) numeral.locale(short);
+            else console.warn(`Language ${language} was not found in the i18n list. This can result in extensions like Numeral.js and Moment.js not working properly. If you want to be sure of proper functioning, adjust the localization of the extensions as necessary.`);            
+        }
+        moment;
+        numeral;
+        debugger;
+    }
 });
 
 /**
@@ -186,7 +202,9 @@ Object.defineProperty(evalocale, "set", {
                     this.load(args[0]);
                     return this;
                 }
-                if(args[0].metadata) this.deriveMetadata(args[0].metadata)                
+                if(args[0].metadata) this.deriveMetadata(args[0].metadata);
+                if(args[0].numeral) numeral.locale(args[0].numeral);
+                if(args[0].moment) numeral.locale(args[0].moment);
                 if(args[0].default) 
                 {
                     Object.defineProperty(evalocale, "default", {
@@ -215,6 +233,11 @@ Object.defineProperty(evalocale, "set", {
         return this;
     }
 });
+
+Object.defineProperty(evalocale, "moment", {
+    readonly: true,
+    value: moment
+})
 
 Object.defineProperty(evalocale, "toCSV", {
     readonly: true,
