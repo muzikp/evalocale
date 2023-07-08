@@ -27,14 +27,14 @@ Browser webpack compiled package installation:
 ### Node.js
 
 ```js
-var $$ = require("locale-core").set("en-Gb", {"a1b2c3d4": "This is {{quality}} library."});
+var $$ = require("elocale").set("en-Gb", {"a1b2c3d4": "This is {{quality}} library."});
 console.log($$("a1b2c3d4", {quality: "an ugly"}));
 ```
 
 ### Browser
 
 ```js
-var $$ = window.locale.set("en-Gb", {"a1b2c3d4": "This is {{quality}} library."});
+var $$ = window.elocale.set("en-Gb", {"a1b2c3d4": "This is {{quality}} library."});
 console.log($$("a1b2c3d4", {quality: "an ugly"}));
 ```
 
