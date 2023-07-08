@@ -5,12 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:commit:push": "webpack --config webpack.config.js && git add . && git commit -m *autocommit* && git push"    
+    "build:commit:push": "webpack --config webpack.config.js && git add . && git commit -m *autocommit* && git push"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "numeral": "^2.0.6",
     "randomstring": "^1.3.0"
   },
   "devDependencies": {
