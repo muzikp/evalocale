@@ -2,6 +2,7 @@
 var rnd = require("randomstring").generate;
 var check = require("./intl-check");
 let _library = {};
+let _default = getDefaultLocale();
 let _metadata = {};
 let _alertsOn = false;
 let _language;
@@ -31,10 +32,7 @@ const evalocale = function() {
 
 Object.defineProperty(evalocale, "default", {
     readonly: true,
-    get: function() {
-        if(typeof window !== "undefined") return window?.localStorage?.getItem("language") || window.navigator?.language || window.navigator?.userLanguage || _language;
-        else return Intl.DateTimeFormat().resolvedOptions().locale;
-    }
+    get: () => getDefaultLocale()
 });
 
 Object.defineProperty(evalocale, "language", {
@@ -255,6 +253,11 @@ Object.defineProperty(evalocale, "diff", {
         return new Intl.RelativeTimeFormat(_language || _default, {style: "long", numeric: "auto"}).format(Math.round(diff), unit);
     }
 });
+
+function getDefaultLocale(){
+    if(typeof window !== "undefined") return window?.localStorage?.getItem("language") || window.navigator?.language || window.navigator?.userLanguage || _language;
+    else return Intl.DateTimeFormat().resolvedOptions().locale;
+}
 
 const _replace = function(text, data) {
     var keys = (text.match(/\{\{(.*?)\}\}/g) || []).map(i => i.match(/\{\{(.*)\}\}/)[1]);

@@ -6,7 +6,10 @@ See also evalocale-express for integration in Express.js based applications.
 ## Key features
 
 - easy to setup and use
+- both Node.js and web application
+- Intl module implementation through various formatters
 - automatic environment language recognition
+- metadata support
 
 ## Install
 
