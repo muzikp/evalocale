@@ -1,19 +1,19 @@
-# Locale
+# ELOCALE (core)
 
-A library for Node.js and browsers to facilitate dynamic loading of texts in different languages.
-See also locale-express for integration in Expressjs applications.
+A core library for Node.js and browsers to facilitate dynamic loading of texts in different languages.
+See also elocale-express for integration in Express.js based applications.
 
 ## Key features
 
 - easy to setup and use
-- automatic environment language recognition 
+- automatic environment language recognition
 
 ## Install
 
 Node.js package instalation:
 
 ```npm
-npm install locale-core
+npm install elocale
 ```
 
 Browser webpack compiled package installation:
