@@ -2,7 +2,7 @@ var rnd = require("randomstring").generate;
 let _library = {};
 let _metadata = {};
 let _language;
-var locale = function() {    
+var elocale = function() {    
     if(typeof [...arguments][0] == "function") {
         [...arguments][0](this);
         return this;
@@ -169,4 +169,4 @@ const _replace = function(text, data) {
     return text;
 }
 
-module.exports = locale;
+module.exports = elocale;
