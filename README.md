@@ -1,7 +1,7 @@
 # Evalocale
 
 A core library for Node.js and browsers to facilitate dynamic loading of texts in different languages.
-See also elocale-express for integration in Express.js based applications.
+See also evalocale-express for integration in Express.js based applications.
 
 ## Key features
 
@@ -13,13 +13,13 @@ See also elocale-express for integration in Express.js based applications.
 Node.js package instalation:
 
 ```npm
-npm install elocale
+npm install evalocale
 ```
 
 Browser webpack compiled package installation:
 
 ```html
-<script src="./src/locale.min.js">
+<script src="./src/evalocale.min.js">
 ```
 
 ## Basic usage
@@ -50,7 +50,7 @@ $$.set("en-Gb", {"a1b2c3d4": "This is {{quality}} library."});
 
 ### load(bundle)
 
-Load method consumer the entire elocale bundle, including the library object, metadata object etc. The argument might be also parsable JSON string.
+Load method consumer the entire data bundle, including the library object, metadata object etc. The argument might be also parsable JSON string.
 
 ```javascript
 $$.load({
