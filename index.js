@@ -1,5 +1,6 @@
 var rnd = require("randomstring").generate;
 var numeral = require("numeral");
+var moment = require("moment");
 
 let _library = {};
 let _metadata = {};
