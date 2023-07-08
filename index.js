@@ -1,11 +1,9 @@
+"use strict";
 var rnd = require("randomstring").generate;
-var numeral = import("numeral");
-var moment = import("moment");
-var numeralLocales = require('numeral/locales');
-var x = numeral.locales;
-var locList = require("i18n-locales");
+var check = require("./intl-check");
 let _library = {};
 let _metadata = {};
+let _alertsOn = false;
 let _language;
 const evalocale = function() {    
     if(typeof [...arguments][0] == "function") {
@@ -39,27 +37,11 @@ Object.defineProperty(evalocale, "default", {
     }
 });
 
-/**
- * Gets the environment language.
- */
-evalocale.default = evalocale.default;
-
 Object.defineProperty(evalocale, "language", {
     get: () => _language,
     set: function(language) {
-        if(locList.indexOf(language) < 0) console.warn(`Language ${language} was not found in the i18n list. This can result in extensions like Numeral.js and Moment.js not working properly. If you want to be sure of proper functioning, adjust the localization of the extensions as necessary.`);
-        if(numeral.locales.hasOwnProperty(language))
-        {
-            debugger;
-        } else
-        {
-            var short = (language.substr(0,2));            
-            if(numeral.locales.hasOwnProperty(short)) numeral.locale(short);
-            else console.warn(`Language ${language} was not found in the i18n list. This can result in extensions like Numeral.js and Moment.js not working properly. If you want to be sure of proper functioning, adjust the localization of the extensions as necessary.`);            
-        }
-        moment;
-        numeral;
-        debugger;
+        if(!_library[language]) _library[language] = {};
+        _language = language;
     }
 });
 
@@ -203,8 +185,6 @@ Object.defineProperty(evalocale, "set", {
                     return this;
                 }
                 if(args[0].metadata) this.deriveMetadata(args[0].metadata);
-                if(args[0].numeral) numeral.locale(args[0].numeral);
-                if(args[0].moment) numeral.locale(args[0].moment);
                 if(args[0].default) 
                 {
                     Object.defineProperty(evalocale, "default", {
@@ -212,6 +192,7 @@ Object.defineProperty(evalocale, "set", {
                         set: args[0].default
                     });
                 }
+                if(args[0].alertsOn) _alertsOn = true;
                 if(args[0].sync || args[0].syncLanguages) this.syncLanguages();
                 if(args[0].language) this.language = args[0].language;
             } else if(typeof args[0] == "string") {
@@ -234,24 +215,21 @@ Object.defineProperty(evalocale, "set", {
     }
 });
 
-Object.defineProperty(evalocale, "moment", {
+Object.defineProperty(evalocale, "number", {
     readonly: true,
-    value: moment
-})
-
-Object.defineProperty(evalocale, "toCSV", {
-    readonly: true,
-    value: function(config = {delimiter: "\t", metadata: true}) {
-        var str = "";
-
+    value: function(value, decimals = undefined) {
+        if(decimals !== undefined && decimals < 1) decimals = 1;
+        return new Intl.NumberFormat(_language || _default, { maximumSignificantDigits: decimals }).format(value);
     }
 })
 
-/**
- * Sets up custom libraries and configurations. If only one argument is given, then the language is set if it is a string type, or the evalocale environment is configured if it is an object. If two arguments (or an even number of arguments) are specified, then the odd argument is taken as a language abbreviation and the even argument as an object with dictionary data. In all cases, the root function evalocale is returned.
- * @returns {this}
- */
-evalocale.set = evalocale.set;
+Object.defineProperty(evalocale, "currency", {
+    readonly: true,
+    value: function(value, currency = "USD") {
+        currency = check(_alertsOn).currency(currency);
+        return new Intl.NumberFormat(_language || _default, { style: 'currency', currency: currency }).format(value);
+    }
+})
 
 const _replace = function(text, data) {
     var keys = (text.match(/\{\{(.*?)\}\}/g) || []).map(i => i.match(/\{\{(.*)\}\}/)[1]);
