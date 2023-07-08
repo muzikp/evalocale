@@ -49,3 +49,5 @@ var $$ = require("locale-core");
 $$.set("en-Gb", {"a1b2c3d4": "This is {{quality}} library."}).set("cs-CZ", {"a1b2c3d4": "Toto je {{quality}} knihovna."});
 console.log($$("a1b2c3d4", {quality: "ošklivá"}));
 ```
+
+## Properties
