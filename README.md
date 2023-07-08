@@ -1,4 +1,4 @@
-# ELOCALE (core)
+# Evalocale
 
 A core library for Node.js and browsers to facilitate dynamic loading of texts in different languages.
 See also elocale-express for integration in Express.js based applications.
@@ -27,14 +27,14 @@ Browser webpack compiled package installation:
 ### Node.js
 
 ```js
-var $$ = require("elocale").set("en-Gb", {"a1b2c3d4": "This is {{quality}} library."});
+var $$ = require("evalocale").set("en-Gb", {"a1b2c3d4": "This is {{quality}} library."});
 console.log($$("a1b2c3d4", {quality: "an ugly"}));
 ```
 
 ### Browser
 
 ```js
-var $$ = window.elocale.set("en-Gb", {"a1b2c3d4": "This is {{quality}} library."});
+var $$ = window.evalocale.set("en-Gb", {"a1b2c3d4": "This is {{quality}} library."});
 console.log($$("a1b2c3d4", {quality: "an ugly"}));
 ```
 
@@ -63,7 +63,7 @@ $$.load({
 #### Example
 
 ```javascript
-var $$ = require("locale-core");
+var $$ = require("evalocale");
 $$.set("en-Gb", {"a1b2c3d4": "This is {{quality}} library."}).set("cs-CZ", {"a1b2c3d4": "Toto je {{quality}} knihovna."});
 console.log($$("a1b2c3d4", {quality: "ošklivá"}));
 ```
@@ -90,5 +90,5 @@ Instead of generating unique keys, it is easier to let the job up to the package
 - chars (Uint): number of characters of each key (default 8)
 
 ```javascript
-var $$ = require("elocale").generate({total: 500, chars: 8, language: ["en-GB", "cs-CZ"]});
+var $$ = require("evalocale").generate({total: 500, chars: 8, language: ["en-GB", "cs-CZ"]});
 ```
