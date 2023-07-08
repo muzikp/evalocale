@@ -38,14 +38,72 @@ var $$ = window.evalocale.set("en-Gb", {"a1b2c3d4": "This is {{quality}} library
 console.log($$("a1b2c3d4", {quality: "an ugly"}));
 ```
 
-## Setting library content
+## Set-up and configuration
 
-There are several ways how to set the particular dictionaries which are stored in the library.
+Most of the necessary service configuration is possible using the flexible *set* method. It consumes different types and amounts of arguments, while if only one argument is specified, then the language is set if it is a string type, or if it is an object, the configuration of the evalocale environment is performed. If two arguments (or an even number of arguments) are specified, then the odd argument is taken as a language abbreviation and the even argument as an object with dictionary data. In all cases, the root function evalocale is returned.
 
-### set(langugage,data)
+***Setting a single dictionary***
 
 ```javascript
 $$.set("en-Gb", {"a1b2c3d4": "This is {{quality}} library."});
+```
+
+***Setting multiple dictionaries***
+
+An even number of arguments indicates that this is a series of name/date pairs. Note that dictionaries have different argument lengths; they can be synchronized later (see below).
+
+```javascript
+$$.set("cs-CZ", {
+        "a1b2": "Jmenuji se {{name}}.",
+        "c3d4": "Je mi {{age}} let."
+    }, "en-GB", {
+        "a1b2": "My name is {{name}}.",
+        "c3d4": "I am {{age}}.",
+        "e5f6": "I am a developer."
+});
+```
+
+***Loading a bundle***
+
+A bundle is a sort of serializied underlying data, including library, metadata etc. If the first (and one and only) argument is object and contains property *library*, it is considered to be a bundle.
+
+```javascript
+let bundle = {"library":{"cs-CZ":{"a1b2":"Jmenuji se {{name}}.","c3d4":"Je mi {{age}} let.","e5f6":""},"en-GB":{"a1b2":"My name is {{name}}.","c3d4":"I am {{age}}.","e5f6":"I am a developer."}},"metadata":{"a1b2":{"app":"retusa","version":1},"c3d4":{"app":"retusa","version":1},"e5f6":{"app":"retusa","version":1}},"language":"en-GB"};
+$$.set(bundle);
+```
+
+***Setting the active language***
+
+Setting the active language can be done in several ways, all of which have the same effect:
+
+```javascript
+// by means of the set method
+$$.set("en-GB");
+// by language getter
+$$.language = "en-GB";
+// by switch method
+$$.switch("en-GB");
+```
+
+***Calling configuration methods***
+
+Many configuration methods might be called by the *set* method. Mind that the configuration cannot be mixed with dictionary data.
+
+```javascript
+$$.set({
+    metadata: {version: 1, group: "A"},
+    sync: true
+});
+```
+
+Sequential calling of *set* methods:
+
+```javascript
+let bundle = {"library":{"cs-CZ":{"a1b2":"Jmenuji se {{name}}.","c3d4":"Je mi {{age}} let.","e5f6":""},"en-GB":{"a1b2":"My name is {{name}}.","c3d4":"I am {{age}}.","e5f6":"I am a developer."}},"metadata":{"a1b2":{"app":"retusa","version":1},"c3d4":{"app":"retusa","version":1},"e5f6":{"app":"retusa","version":1}},"language":"en-GB"};
+var config = {
+    metadata: {version: 1, group: "A"},
+    sync: true}
+$$.set(bundle).set(config);
 ```
 
 ### load(bundle)

@@ -34,10 +34,31 @@ Object.defineProperty(evalocale, "default", {
     }
 });
 
+/**
+ * Gets the environment language.
+ */
+evalocale.default = evalocale.default;
+
 Object.defineProperty(evalocale, "language", {
     get: () => _language,
     set: (language) => _language = language
 });
+
+/**
+ * Sets the language property and return itself. Workaround for getter/setter of language if you want to smoothly continue to call other self-returing method.
+ * @param {string} language The active language.
+ * @returns 
+ */
+evalocale.switch = function(language) {
+    if(!_library[language])
+    {
+        _library[language] = {};
+    } else 
+    {
+        _language = language;
+    }
+    return this;
+}
 
 Object.defineProperty(evalocale, "library", {
     readonly: true,
@@ -96,6 +117,7 @@ Object.defineProperty(evalocale, "generate", {
                 _library[l][i] = ""
             }
         }
+        if(config.metadata) this.deriveMetadata(config.metadata)
         return this;
     }
 });
@@ -140,11 +162,11 @@ Object.defineProperty(evalocale, "deriveMetadata", {
         if(Array.isArray(schema)) {
             for(let s of schema) {
                 _schema[s] = ""
-            }
+            }            
         }
         else if (typeof schema == "object") _schema = schema;
         [...keys.keys()].forEach(function(key){
-            _metadata[key] = schema;
+            _metadata[key] = _schema;
         });
         return this;
     }
@@ -152,14 +174,58 @@ Object.defineProperty(evalocale, "deriveMetadata", {
 
 Object.defineProperty(evalocale, "set", {
     readonly: true,
-    value: function(language, data = {}) {                
-        if(!_library[language]) _library[language] = {};
-        Object.keys(data).forEach(function(key){
-            _library[language][key] = data[key];
-        });        
+    value: function(language, data = {}) {
+        let args = [...arguments];
+        if(args.length == 0) return this;
+        else if(args.length == 1) {
+            if(typeof args[0] == "object") {
+                if(args[0].library) {
+                    this.load(args[0]);
+                    return this;
+                }
+                if(args[0].metadata) this.deriveMetadata(args[0].metadata)                
+                if(args[0].default) 
+                {
+                    Object.defineProperty(evalocale, "default", {
+                        get: _default,
+                        set: args[0].default
+                    });
+                }
+                if(args[0].sync || args[0].syncLanguages) this.syncLanguages();
+                if(args[0].language) this.language = args[0].language;
+            } else if(typeof args[0] == "string") {
+                this.switch(args[0]);
+            } else {
+
+            }
+            return this;            
+        }
+        else if(args.length % 2 == 0) {
+            for(var i = 0; i < args.length; i += 2) {
+                var language = args[i], data = args[i+1];                
+                if(!_library[language]) _library[language] = {};
+                Object.keys(data).forEach(function(key){
+                    _library[language][key] = data[key];
+                });        
+            }            
+        }        
         return this;
     }
 });
+
+Object.defineProperty(evalocale, "toCSV", {
+    readonly: true,
+    value: function(config = {delimiter: "\t", metadata: true}) {
+        var str = "";
+
+    }
+})
+
+/**
+ * Sets up custom libraries and configurations. If only one argument is given, then the language is set if it is a string type, or the evalocale environment is configured if it is an object. If two arguments (or an even number of arguments) are specified, then the odd argument is taken as a language abbreviation and the even argument as an object with dictionary data. In all cases, the root function evalocale is returned.
+ * @returns {this}
+ */
+evalocale.set = evalocale.set;
 
 const _replace = function(text, data) {
     var keys = (text.match(/\{\{(.*?)\}\}/g) || []).map(i => i.match(/\{\{(.*)\}\}/)[1]);
