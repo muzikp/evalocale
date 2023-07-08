@@ -78,3 +78,17 @@ Returns the environment (Node.js or browser) user language, e.g. en-GB etc.
 console.log($$.default);
 // e.g. cs-CZ
 ```
+
+## Utils
+
+### generate(config)
+
+Instead of generating unique keys, it is easier to let the job up to the package. Calling the root method *generate* creates a required languages and items. The config argument is an object with following properties:
+
+- total (UInt): total of items to be generated
+- language (string | Array of strings): dictionary(s) to be created
+- chars (Uint): number of characters of each key (default 8)
+
+```javascript
+var $$ = require("elocale").generate({total: 500, chars: 8, language: ["en-GB", "cs-CZ"]});
+```
