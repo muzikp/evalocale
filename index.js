@@ -1,5 +1,6 @@
 var rnd = require("randomstring").generate;
-const lib = {};
+const _library = {};
+let _metadata = {};
 let _language;
 let _default = (function() {
     if(typeof window !== "undefined") return window?.localStorage?.getItem("language") || window.navigator?.language || window.navigator?.userLanguage || __default;
@@ -13,7 +14,7 @@ var locale = function() {
     {
         let code = [...arguments][0];
         let data = [...arguments][1];
-        let _ = lib[_language || _default] || lib[(Object.keys(lib) || [])[0]] || {};    
+        let _ = _library[_language || _default] || _library[(Object.keys(_library) || [])[0]] || {};    
         if(!code) return "";
         else if(typeof code == "object") {
             var _text = _default ? code[_default] : Object.entries(code)[0][1];
@@ -36,9 +37,17 @@ Object.defineProperty(locale, "language", {
 
 Object.defineProperty(locale, "library", {
     readonly: true,
-    value: lib
+    value: _library
 })
 
+Object.defineProperty(locale, "metadata", {
+    readonly: true,
+    value: _metadata
+})
+
+/**
+ * Returns the default language guessed by either the Node or the browser environment.
+ */
 Object.defineProperty(locale, "default", {
     readonly: true,
     get: () => _default    
@@ -51,20 +60,23 @@ Object.defineProperty(locale, "load", {
     readonly: true,
     value: function() {
         var arg = [...arguments][0];
-        
-
-        
-
+        try {
+            if(typeof arg == "string") arg = JSON.parse(arg);
+        } catch(e){
+            throw "Failed to load the data."            
+        }
+        if(typeof arg != "object") throw "The locale 'load' argument must be an object."
+        else if(Array.isArray(arg)) throw "The locale 'load' argument must be an object, not an array."
     }
 });
 
 Object.defineProperty(locale, "save", {
     readonly: true,
-    value: function(path){        
-        try {
-
-        } catch(e) {
-
+    value: function(){        
+        return {
+            library: _library,
+            metadata: _metadata,
+            language: _language
         }
     }
 })
@@ -78,21 +90,71 @@ Object.defineProperty(locale, "generate", {
         config.chars = Number(config.chars) < 1 ? 1 : Math.round(Number(config.chars));
         var items = [...Array(10)].map(e => rnd(config.chars));        
         for(let l of config.language) {
-            if(!lib[l]) lib[l] = {};
+            if(!_library[l]) _library[l] = {};
             for(let i of items){
-                lib[l][i] = ""
+                _library[l][i] = ""
             }
         }
+        return this;
+    }
+});
+
+/**
+ * Extends the keys of all language libraries so that they all have the same keys. Ignores existing keys and adds only those that are missing from the given library.
+ * @param {boolean} writeValues If true, writes the last found value of the given key. Default false.
+ * @returns {self} Returns the locale function.
+ */
+Object.defineProperty(locale, "syncLanguages", {
+    readonly: true,
+    value: function(writeValues = false){
+        var keys = new Map();
+        Object.keys(_library).forEach(function(libKey){
+            Object.keys(_library[libKey]).forEach(function(itemKey){
+                keys.set(itemKey, writeValues ? _library[libKey][itemKey] : "");
+            })
+        });            
+        
+        [...keys.keys()].forEach(function(key){                 
+            Object.keys(_library).forEach(function(libKey){                                
+                if(_library[libKey][key] === undefined) _library[libKey][key] = writeValues ? keys.get(key) : "";                
+            });
+        });
+        return this;
+    }
+})
+
+/**
+ * Derives a secondary metadata package based on the keys in the library. Metadata has the same keys as libraries, but their values are objects with properties defined using the schema argument. Metadata is used for a more precise description of individual language records.
+ */
+Object.defineProperty(locale, "deriveMetadata", {
+    readonly: true,
+    value: function(schema = {}) {
+        var keys = new Map();
+        Object.keys(_library).forEach(function(libKey){
+            Object.keys(_library[libKey]).forEach(function(itemKey){
+                keys.set(itemKey, "");
+            })
+        });
+        var _schema = {};
+        if(Array.isArray(schema)) {
+            for(let s of schema) {
+                _schema[s] = ""
+            }
+        }
+        else if (typeof schema == "object") _schema = schema;
+        [...keys.keys()].forEach(function(key){
+            _metadata[key] = schema;
+        });
         return this;
     }
 })
 
 Object.defineProperty(locale, "set", {
     readonly: true,
-    value: function(language, data) {                
-        if(!lib[language]) lib[language] = {};
+    value: function(language, data = {}) {                
+        if(!_library[language]) _library[language] = {};
         Object.keys(data).forEach(function(key){
-            lib[language][key] = data[key];
+            _library[language][key] = data[key];
         });        
         return this;
     }
