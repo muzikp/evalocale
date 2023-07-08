@@ -1,4 +1,12 @@
-# locale-core
+# Locale
+
+A library for Node.js and browsers to facilitate dynamic loading of texts in different languages.
+See also locale-express for integration in Expressjs applications.
+
+## Key features
+
+- easy to setup and use
+- automatic environment language recognition 
 
 ## Install
 

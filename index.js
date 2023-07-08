@@ -28,7 +28,7 @@ var locale = function() {
 
 Object.defineProperty(locale, "default", {
     readonly: true,
-    value: function() {
+    get: function() {
         if(typeof window !== "undefined") return window?.localStorage?.getItem("language") || window.navigator?.language || window.navigator?.userLanguage || _language;
         else return Intl.DateTimeFormat().resolvedOptions().locale;
     }
@@ -48,14 +48,6 @@ Object.defineProperty(locale, "metadata", {
     readonly: true,
     value: _metadata
 })
-
-/**
- * Returns the default language guessed by either the Node or the browser environment.
- */
-Object.defineProperty(locale, "default", {
-    readonly: true,
-    get: () => _default    
-});
 
 /**
  * Loads a serialized locale bundle into the method's storage.
@@ -85,7 +77,7 @@ Object.defineProperty(locale, "save", {
         return {
             library: _library,
             metadata: _metadata,
-            language: _language
+            language: _language || this.default
         }
     }
 })
