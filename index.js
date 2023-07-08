@@ -2,7 +2,7 @@ var rnd = require("randomstring").generate;
 let _library = {};
 let _metadata = {};
 let _language;
-var elocale = function() {    
+const elocale = function() {    
     if(typeof [...arguments][0] == "function") {
         [...arguments][0](this);
         return this;
@@ -26,7 +26,7 @@ var elocale = function() {
     
 };
 
-Object.defineProperty(locale, "default", {
+Object.defineProperty(elocale, "default", {
     readonly: true,
     get: function() {
         if(typeof window !== "undefined") return window?.localStorage?.getItem("language") || window.navigator?.language || window.navigator?.userLanguage || _language;
@@ -34,17 +34,17 @@ Object.defineProperty(locale, "default", {
     }
 });
 
-Object.defineProperty(locale, "language", {
+Object.defineProperty(elocale, "language", {
     get: () => _language,
     set: (language) => _language = language
 });
 
-Object.defineProperty(locale, "library", {
+Object.defineProperty(elocale, "library", {
     readonly: true,
     value: _library
 })
 
-Object.defineProperty(locale, "metadata", {
+Object.defineProperty(elocale, "metadata", {
     readonly: true,
     value: _metadata
 })
@@ -52,7 +52,7 @@ Object.defineProperty(locale, "metadata", {
 /**
  * Loads a serialized locale bundle into the method's storage.
  */
-Object.defineProperty(locale, "load", {
+Object.defineProperty(elocale, "load", {
     readonly: true,
     value: function() {
         var arg = [...arguments][0];
@@ -71,7 +71,7 @@ Object.defineProperty(locale, "load", {
     }
 });
 
-Object.defineProperty(locale, "save", {
+Object.defineProperty(elocale, "save", {
     readonly: true,
     value: function(){        
         return {
@@ -82,7 +82,7 @@ Object.defineProperty(locale, "save", {
     }
 })
 
-Object.defineProperty(locale, "generate", {
+Object.defineProperty(elocale, "generate", {
     readonly: true,
     value: function(config = {chars: 8, total: 100}) {
         if(!config.language) throw "At least one language must be specified";
@@ -105,7 +105,7 @@ Object.defineProperty(locale, "generate", {
  * @param {boolean} writeValues If true, writes the last found value of the given key. Default false.
  * @returns {self} Returns the locale function.
  */
-Object.defineProperty(locale, "syncLanguages", {
+Object.defineProperty(elocale, "syncLanguages", {
     readonly: true,
     value: function(writeValues = false){
         var keys = new Map();
@@ -127,7 +127,7 @@ Object.defineProperty(locale, "syncLanguages", {
 /**
  * Derives a secondary metadata package based on the keys in the library. Metadata has the same keys as libraries, but their values are objects with properties defined using the schema argument. Metadata is used for a more precise description of individual language records.
  */
-Object.defineProperty(locale, "deriveMetadata", {
+Object.defineProperty(elocale, "deriveMetadata", {
     readonly: true,
     value: function(schema = {}) {
         var keys = new Map();
@@ -150,7 +150,7 @@ Object.defineProperty(locale, "deriveMetadata", {
     }
 })
 
-Object.defineProperty(locale, "set", {
+Object.defineProperty(elocale, "set", {
     readonly: true,
     value: function(language, data = {}) {                
         if(!_library[language]) _library[language] = {};
