@@ -139,7 +139,7 @@ console.log($$.default);
 
 ## Utils
 
-### generate(config)
+### Generator
 
 Instead of generating unique keys, it is easier to let the job up to the package. Calling the root method *generate* creates a required languages and items. The config argument is an object with following properties:
 
@@ -148,5 +148,26 @@ Instead of generating unique keys, it is easier to let the job up to the package
 - chars (Uint): number of characters of each key (default 8)
 
 ```javascript
-var $$ = require("evalocale").generate({total: 500, chars: 8, language: ["en-GB", "cs-CZ"]});
+var $$ = require("evalocale").generate({total: 500, chars: 8, language: ["en-GB", "cs-CZ"], metadata: {app: "someApp"}});
+```
+
+### Formatters
+
+The Intl module allows flexible formatting of numbers and data in many languages. Evalocale supports simplified calls for several common user requests. In addition, however, you can use the functions of the Intl module as you wish.
+
+- **number**(value, decimals): converts a number to a locale string; if decimals are not specified, they are set to auto
+- **currency**(value, currency): converts a number to a locale currency string; the currency code is checked against the list of acceplable currency codes (is not case sensitive)
+- **time**(value, short=false): converts a date instance to time string; if short (default false) is set to true, returns only hours and minutes, otherwise hh:mm:ss
+- **date**(value, short=false): converts a date instance to date string; if short (default false) is set to true, returns only hours and minutes, otherwise hh:mm:ss
+- **diff**(thisTime, thatTime): return a humanized time span between the two dates; the unit is automatically guessed from the size of the difference
+
+```javascript
+$$.number(65423.12);
+$$.number(65423.12, 3);
+$$.currency(15000, "EUR");
+$$.time(new Date());
+$$.time(new Date(), true);
+$$.date(new Date());
+$$.date(new Date(), true);
+$$.diff(new Date("2023-07-01"),new Date("2023-07-07"));
 ```
