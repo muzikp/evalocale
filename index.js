@@ -1,11 +1,7 @@
 var rnd = require("randomstring").generate;
-const _library = {};
+let _library = {};
 let _metadata = {};
 let _language;
-let _default = (function() {
-    if(typeof window !== "undefined") return window?.localStorage?.getItem("language") || window.navigator?.language || window.navigator?.userLanguage || __default;
-    else return Intl.DateTimeFormat().resolvedOptions().locale;
-})();
 var locale = function() {    
     if(typeof [...arguments][0] == "function") {
         [...arguments][0](this);
@@ -29,6 +25,14 @@ var locale = function() {
     };
     
 };
+
+Object.defineProperty(locale, "default", {
+    readonly: true,
+    value: function() {
+        if(typeof window !== "undefined") return window?.localStorage?.getItem("language") || window.navigator?.language || window.navigator?.userLanguage || _language;
+        else return Intl.DateTimeFormat().resolvedOptions().locale;
+    }
+});
 
 Object.defineProperty(locale, "language", {
     get: () => _language,
@@ -66,7 +70,12 @@ Object.defineProperty(locale, "load", {
             throw "Failed to load the data."            
         }
         if(typeof arg != "object") throw "The locale 'load' argument must be an object."
-        else if(Array.isArray(arg)) throw "The locale 'load' argument must be an object, not an array."
+        else if(Array.isArray(arg)) throw "The locale 'load' argument must be an object, not an array.";
+        else {
+            _library = arg.library
+            _metadata = arg.metadata;
+
+        }
     }
 });
 
