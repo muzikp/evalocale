@@ -229,7 +229,32 @@ Object.defineProperty(evalocale, "currency", {
         currency = check(_alertsOn).currency(currency);
         return new Intl.NumberFormat(_language || _default, { style: 'currency', currency: currency }).format(value);
     }
-})
+});
+
+Object.defineProperty(evalocale, "time", {
+    readonly: true,
+    value: function(value, short = false) {        
+        return new Intl.DateTimeFormat(_language || _default, {hour: "numeric", minute: "numeric", second: short ? undefined : "numeric", hour12: false }).format(value);
+    }
+});
+
+Object.defineProperty(evalocale, "date", {
+    readonly: true,
+    value: function(value, short = false) {        
+        return new Intl.DateTimeFormat(_language || _default, {year: 'numeric', month: short ? "numeric" : "long", day: 'numeric'}).format(value);
+    }
+});
+
+Object.defineProperty(evalocale, "diff", {
+    readonly: true,
+    value: function(thisTime, thatTime) {                  
+        var diff = new Date(thatTime).getTime() - new Date(thisTime).getTime();
+        var d = Math.abs(diff) / 1000;
+        var unit = d < 60 ? "second" : d < 60*60 ? "minute" : d < 60*60*24 ? "hour" : d < 60 * 60 * 24 * 31 ? "day" : d < 60 * 60 * 24 * 365 ? "month" : "year";
+        diff = unit == "second" ? diff/1000 : unit == "minute" ? diff/(60*1000) : unit == "hour" ? diff/(60*60*1000) : unit == "day" ? diff/(60*1000*60*24) : unit == "month" ? diff/(60*1000*60*24*30) : unit == "year" ? diff/(60*1000*60*24*365) : diff;
+        return new Intl.RelativeTimeFormat(_language || _default, {style: "long", numeric: "auto"}).format(Math.round(diff), unit);
+    }
+});
 
 const _replace = function(text, data) {
     var keys = (text.match(/\{\{(.*?)\}\}/g) || []).map(i => i.match(/\{\{(.*)\}\}/)[1]);
