@@ -122,6 +122,7 @@ $$.set(bundle).set(config).set("en-GB")("a1b2", {name: "John Doe"});
 ## Methods & properties
 
 | **property** | **description** | **read** | **write** |
+| ------------ | --------------- | -------- | --------- |
 | default | Gets the environment language. The value is extracted differently for Node.js and browser environment. | true | false |
 
 ### default (readonly)
