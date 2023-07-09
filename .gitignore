@@ -132,3 +132,5 @@ dist
 /webpack.config.js
 /.vscode
 /.vscode/launch.json
+/bundle.json
+/test.csv

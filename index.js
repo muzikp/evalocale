@@ -49,8 +49,10 @@ Object.defineProperty(evalocale, "library", {
 })
 
 Object.defineProperty(evalocale, "metadata", {
-    readonly: true,
-    value: _metadata
+    get: () => _metadata,
+    set: function(value) {
+        _metadata = value;
+    }
 })
 
 /**
@@ -70,8 +72,10 @@ Object.defineProperty(evalocale, "load", {
         else {
             _library = arg.library
             _metadata = arg.metadata;
+            _language = arg.language;
 
         }
+        return this;
     }
 });
 
@@ -238,9 +242,88 @@ Object.defineProperty(evalocale, "diff", {
     }
 });
 
+Object.defineProperty(evalocale, "toCSV", {
+    readonly: true,
+    value: function(delimiter = "\t"){
+        var arr = this.toArray();
+        var str = "";
+        str += Object.keys(arr[0]).map(e => `"${e}"`).join(delimiter) + "\n";
+        for(var i = 1; i < arr.length; i++) {
+            str += Object.keys(arr[0]).map(k => typeof arr[i][k] == "string" ? `"${arr[i][k]}"` : arr[i][k]).join(delimiter) + "\n";            
+        }
+        return str;        
+    }
+});
+
+Object.defineProperty(evalocale, "fromCSV", {
+    readonly: true,
+    value: function(delimiter = "\t"){
+        var arr = this.toArray();
+        var str = "";
+        str += Object.keys(arr[0]).map(e => `"${e}"`).join(delimiter) + "\n";
+        for(var i = 1; i < arr.length; i++) {
+            str += Object.keys(arr[0]).map(k => typeof arr[i][k] == "string" ? `"${arr[i][k]}"` : arr[i][k]).join(delimiter) + "\n";            
+        }
+        return str;        
+    }
+});
+
+Object.defineProperty(evalocale, "toArray", {
+    readonly: true,
+    value: function() {
+        var keys = Object.keys(getBundleKeys());
+        var mh = Object.keys(getMetadataHeaders());
+        var lh = Object.keys(_library);
+        var arr = [];    
+        for(let key of keys) {
+            var obj = {id: key};
+            for(let _mh of mh)
+            {
+                obj[_mh] = (_metadata || {})[key][_mh]
+            }
+            for(let _lh of lh) {
+                obj[_lh] = (_library?.[_lh] || {})[key]
+            }
+            arr.push(obj);
+        }
+        return arr;
+    }
+});
+
 function getDefaultLocale(){
     if(typeof window !== "undefined") return window?.localStorage?.getItem("language") || window.navigator?.language || window.navigator?.userLanguage || _language;
     else return Intl.DateTimeFormat().resolvedOptions().locale;
+}
+
+function getMetadataHeaders(){
+    var m = new Map();
+    Object.keys(_metadata || {}).forEach(function(mk){
+        Object.keys((_metadata||{})[mk]).forEach(function(_){
+            var type = typeof (_metadata || {})[mk][_];
+            if(m.get(_) === undefined) m.set(_, type);
+            else if(type == "string") m.set(_, "string");            
+        });
+    });
+    return mapToObject(m);    
+}
+
+function getBundleKeys() {
+    var map = new Map();
+    Object.keys((_metadata || {})).forEach(function(key){
+        map.set(key,1)
+    });
+    Object.keys(_library).forEach(function(lang){
+        Object.keys(_library[lang]).forEach(function(key){
+            map.set(key, 1);
+        });
+    });
+    return mapToObject(map);
+}
+
+function mapToObject(m) {
+    var obj = {};
+    [...m].forEach(_ => obj[_[0]] = _[1]);
+    return obj;
 }
 
 const _replace = function(text, data) {
