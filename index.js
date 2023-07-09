@@ -6,28 +6,19 @@ let _default = getDefaultLocale();
 let _metadata = {};
 let _alertsOn = false;
 let _language;
-const evalocale = function() {    
-    if(typeof [...arguments][0] == "function") {
-        [...arguments][0](this);
-        return this;
-    } else if(typeof [...arguments][0] == "string") 
-    {
-        let code = [...arguments][0];
-        let data = [...arguments][1];
-        let _ = _library[_language || _default] || _library[(Object.keys(_library) || [])[0]] || {};    
-        if(!code) return "";
-        else if(typeof code == "object") {
-            var _text = _default ? code[_default] : Object.entries(code)[0][1];
-            return _replace(_text, data)
-        }
-        var _text = _[code];        
-        if(!_text) return _replace(code,{value: code});
-        else {
-            _text = _replace(_text, data)
-            return _text;
-        }
-    };
-    
+const evalocale = function(code, data = {}, language) {    
+    let _ = _library[language || _language || _default] || _library[(Object.keys(_library) || [])[0]] || {};    
+    if(!code) return "";
+    else if(typeof code == "object") {
+        var _text = _default ? code[_default] : Object.entries(code)[0][1];
+        return _replace(_text, data)
+    }
+    var _text = _[code];        
+    if(!_text) return _replace(code,{value: code});
+    else {
+        _text = _replace(_text, data)
+        return _text;
+    }
 };
 
 // #region PROPERTIES
