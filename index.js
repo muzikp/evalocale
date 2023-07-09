@@ -40,6 +40,7 @@ Object.defineProperty(evalocale, "default", {
 Object.defineProperty(evalocale, "language", {
     get: () => _language,
     set: function(language) {
+        check(_alertsOn).language(language);
         if(!_library[language]) _library[language] = {};
         _language = language;
     }
@@ -53,22 +54,24 @@ Object.defineProperty(evalocale, "alertsOn", {
 });
 
 Object.defineProperty(evalocale, "library", {
-    readonly: true,
-    value: _library
+    get: () => _library,
+    set: function(value) {
+        if(typeof value != "object") throw "Library must be an object.";
+        else _library = value;
+    }
 })
 
 Object.defineProperty(evalocale, "metadata", {
     get: () => _metadata,
     set: function(value) {
-        _metadata = value;
+        if(typeof value != "object") throw "Metadata must be an object.";
+        else _metadata = value;
     }
 })
 
 // #endregion
 
-/**
- * Loads a serialized locale bundle into the method's storage.
- */
+// #region METHODS
 Object.defineProperty(evalocale, "load", {
     readonly: true,
     value: function() {
