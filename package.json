@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:commit:push": "webpack --config webpack.config.js && git add . && git commit -m ${env.npm_package_version} && git push"
+    "build:commit:push": "webpack --config webpack.config.js && git add . && git commit -m 1.0.2 && git push"
   },
   "keywords": [],
   "author": "",
