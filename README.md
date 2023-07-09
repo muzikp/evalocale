@@ -122,13 +122,12 @@ $$.set(bundle).set(config).set("en-GB")("a1b2", {name: "John Doe"});
 ## Methods
 
 | **method** | **description** | **argument** | **argument property** | **required** | **default** | **argument role** |
-| ---------- | --------------- | ------------ | --------------------- | ------------ | ----------- | ----------------- | ------------ |
+| ---------- | --------------- | ------------ | --------------------- | ------------ | ----------- | ----------------- |
 | generate | Generates an entires bundle, containg dictionaries | config | total | false | 1 | defines how many elements in each dictionary should be created |
 | | | | chars | false | 8 | defines the lenght of a generated key |
 | | | | metadata | false | {} | If not undefined, specifies the schema of metadata; the metadata object is generated with every generated key and a value represented by the schema |
 
 ## Properties
-
 
 | **property** | **description** | **read** | **write** |
 | ------------ | --------------- | -------- | --------- |
