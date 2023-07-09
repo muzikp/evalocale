@@ -122,13 +122,17 @@ $$.set(bundle).set(config).set("en-GB")("a1b2", {name: "John Doe"});
 ## Methods
 
 | **method** | **description** | **argument** | **argument property** | **type** | **required** | **default** | **argument role** |
-| ---------- | --------------- | ------------ | --------------------- | ------------ | ----------- | ----------------- |
-| deriveMetadata | Generates (or updates) a metadata objec for existing dictionaries. | schema | | Object / Array | false | {} | Specifies the metadata structure. |
-| generate | Generates an entires bundle, containg dictionaries | config | object | total | false | 1 | defines how many elements in each dictionary should be created |
+| ---------- | --------------- | ------------ | --------------------- | ------------ | ----------- | ----------------- | ---------|
+| ***deriveMetadata*** | Generates (or updates) a metadata objec for existing dictionaries. | schema | | Object / Array | false | {} | Specifies the metadata structure. |
+| ***generate*** | Generates an entires bundle, containg dictionaries | config | object | total | false | 1 | defines how many elements in each dictionary should be created |
 | | | | chars | UInt | false | 8 | defines the lenght of a generated key |
-| | | | language | String / Array | false | 8 | defines the lenght of a generated key |
+| | | | language | String / Array | false | 8 | Defines the dictionaries to be generated. It can either be a string or an array of strings representing the language i18n code (e.g. en-GB) |
 | | | | metadata | Object / Array | false | {} | If not undefined, specifies the schema of metadata; the metadata object is generated with every generated key and a value represented by the schema |
-| syncLanguages | Extends the keys of all language libraries so that they all have the same keys. Ignores existing keys and adds only those that are missing from the given library. | writeValues | | boolean | false | false | If true, assign a non-empty found value for the key from another language where a value is non-empty. |
+| ***load*** | Loads the entire bundle of data, including the library, metadata etc. A workaround for the *set* method with one object-type argument. | bundle | library | Object | false | {} | Specifies the library element. |
+| | | | metadata | Object | false | {} | Specifies the metadata element. |
+| | | | language | String | false | undefined | Specifies an active language |
+| ***save*** | A counterpart of the *load* method that exports the underlying data. See *load* for output structure. | | | | | |
+| ***syncLanguages*** | Extends the keys of all language libraries so that they all have the same keys. Ignores existing keys and adds only those that are missing from the given library. | writeValues | | boolean | false | false | If true, assign a non-empty found value for the key from another language where a value is non-empty. |
 
 ## Properties
 
@@ -143,11 +147,7 @@ $$.set(bundle).set(config).set("en-GB")("a1b2", {name: "John Doe"});
 
 ### Generator
 
-Instead of generating unique keys, it is easier to let the job up to the package. Calling the root method *generate* creates a required languages and items. The config argument is an object with following properties:
-
-- total (UInt): total of items to be generated
-- language (string | Array of strings): dictionary(s) to be created
-- chars (Uint): number of characters of each key (default 8)
+Instead of generating unique keys, it is easier to let the job up to the package. Calling the root method *generate* creates a required language(s) and items. See methods for further information.
 
 ```javascript
 var $$ = require("evalocale").generate({total: 500, chars: 8, language: ["en-GB", "cs-CZ"], metadata: {app: "someApp"}});
@@ -156,6 +156,8 @@ var $$ = require("evalocale").generate({total: 500, chars: 8, language: ["en-GB"
 ### Formatters
 
 The Intl module allows flexible formatting of numbers and data in many languages. Evalocale supports simplified calls for several common user requests. In addition, however, you can use the functions of the Intl module as you wish.
+
+| **method** |
 
 - **number**(value, decimals): converts a number to a locale string; if decimals are not specified, they are set to auto
 - **currency**(value, currency): converts a number to a locale currency string; the currency code is checked against the list of acceplable currency codes (is not case sensitive)
