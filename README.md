@@ -144,13 +144,33 @@ $$.set(bundle).set(config).set("en-GB")("a1b2", {name: "John Doe"});
 
 ## Properties
 
+Properties can be get/set by means plain getter/setter, or eventualy by the *set* method (see bellow).
+
 | **property** | **description** | **read only** |
-| ------------ | --------------- | -------- | --------- |
+| ------------ | --------------- | -------- |
 | alertsOn | Turns on/off console.warn messages. It is recommend to use alertsOn in the development mode to watch possible drawbacks. | - |
 | default | Gets the environment language. The value is extracted differently for Node.js and browser environment. | yes |
 | language | Gets or sets the active language. | - |
-| library | Gets the underlying library package, containg all the dictionaries. | - |
-| metadata | Get the underlying metadata package. | - |
+| library | Gets or sets the underlying library package, containg all the dictionaries. | - |
+| metadata | Get or sets the underlying metadata package. | - |
+
+The two samples below have the same effects.
+
+***Configuration by properties***
+
+```javascript
+$$.alertsOn = false;
+$$.language = "en-GB";
+```
+
+***Configuration by set method***
+
+```javascript
+$$.set({
+    alertsOn: false;
+    language: "en-GB"
+});
+```
 
 ## Utils
 
