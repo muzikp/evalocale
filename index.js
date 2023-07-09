@@ -23,6 +23,13 @@ const evalocale = function(code, data = {}, language) {
 
 // #region PROPERTIES
 
+Object.defineProperty(evalocale, "length", {
+    readonly: true,
+    get: function(){
+        return Math.max(...Object.keys(_library || {}).map((lkey) => Object.keys(_library[lkey] || {}).length));
+    }
+});
+
 Object.defineProperty(evalocale, "default", {
     readonly: true,
     get: () => getDefaultLocale()
@@ -205,6 +212,23 @@ Object.defineProperty(evalocale, "set", {
         return this;
     }
 });
+
+Object.defineProperty(evalocale, "create", {
+    readonly: true,
+    value: function(length = 1, chars) {
+        if(Object.keys(_library).length == 0) throw "Cannot create records without at least one dictionary defined.";
+        if(chars === undefined || chars < 2) {
+            var chs = [...Object.keys(_library).map((lkey) => Object.keys(_library[lkey]).map(ikey => ikey.length))].flat();
+            if(chs.length > 0) chars = Math.round(chs.reduce((a,b) => a+b)/chs.length);
+            else chars = 8;
+        }
+        for(var i = 0; i < length; i++) {
+            var _id = rnd(chars);
+            Object.keys(_library).forEach(lkey => _library[lkey][_id] = "");
+        }
+        return this;
+    }
+})
 
 Object.defineProperty(evalocale, "clean", {
     readonly: true,

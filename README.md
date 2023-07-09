@@ -124,6 +124,8 @@ $$.set(bundle).set(config).set("en-GB")("a1b2", {name: "John Doe"});
 | **method** | **description** | **argument** | **argument property** | **type** | **required** | **default** | **argument role** |
 | ---------- | --------------- | ------------ | --------------------- | ------------ | ----------- | ----------------- | ---------|
 | ***clean*** | Deletes entries with an empty value from dictionaries. Deletion can be done in two ways. If the *separate* argument is true, it deletes all empty entries from each dictionary (regardless of whether the same entry in another dictionary is not empty). If false, deletes only those records that are empty across all dictionaries.| separate | | boolean | false | false | If true, removes blank entries in each dictionary regardless of value of the same key in other dictionaries. If false (default), removes only entries with keys of empty value across all dictionaries. |
+| ***create*** | Appends N new records to each dictionary. Metadata ignored so far | length | | UInt | false | 1 | Number (N) of records to be generated. |
+| | | chars | | UInt | false | - | The length of a key. If not specified, either average length of existing keys is calculated, or (if no records exists) is set to 8. |
 | ***deriveMetadata*** | Generates (or updates) a metadata objec for existing dictionaries. | schema | | Object / Array | false | {} | Specifies the metadata structure. |
 | ***fromArray*** | Populates the underlying data with an array of key/value pairs, including languages and metadata. | arr | Array | | true |  | An array containing the library/metadata values. |
 | | | config | languages | Array | false | null | Defines languages present in the arr argument. If empty, the methods tries to identify the languages on its own. |
@@ -152,6 +154,7 @@ Properties can be get/set by means plain getter/setter, or eventualy by the *set
 | alertsOn | Turns on/off console.warn messages. It is recommend to use alertsOn in the development mode to watch possible drawbacks. | - |
 | default | Gets the environment language. The value is extracted differently for Node.js and browser environment. | yes |
 | language | Gets or sets the active language. | - |
+| length | Gets the number of entries in the dictionary with the most entries from all dictionaries. Overrides the length property of the base. | yes |
 | library | Gets or sets the underlying library package, containg all the dictionaries. | - |
 | metadata | Get or sets the underlying metadata package. | - |
 
