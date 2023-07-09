@@ -123,6 +123,7 @@ $$.set(bundle).set(config).set("en-GB")("a1b2", {name: "John Doe"});
 
 | **method** | **description** | **argument** | **argument property** | **type** | **required** | **default** | **argument role** |
 | ---------- | --------------- | ------------ | --------------------- | ------------ | ----------- | ----------------- | ---------|
+| ***clean*** | Deletes entries with an empty value from dictionaries. Deletion can be done in two ways. If the *separate* argument is true, it deletes all empty entries from each dictionary (regardless of whether the same entry in another dictionary is not empty). If false, deletes only those records that are empty across all dictionaries.| separate | | boolean | false | false | If true, removes blank entries in each dictionary regardless of value of the same key in other dictionaries. If false (default), removes only entries with keys of empty value across all dictionaries. |
 | ***deriveMetadata*** | Generates (or updates) a metadata objec for existing dictionaries. | schema | | Object / Array | false | {} | Specifies the metadata structure. |
 | ***fromArray*** | Populates the underlying data with an array of key/value pairs, including languages and metadata. | arr | Array | | true |  | An array containing the library/metadata values. |
 | | | config | languages | Array | false | null | Defines languages present in the arr argument. If empty, the methods tries to identify the languages on its own. |

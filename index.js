@@ -215,6 +215,34 @@ Object.defineProperty(evalocale, "set", {
     }
 });
 
+Object.defineProperty(evalocale, "clean", {
+    readonly: true,
+    value: function(separate = false){
+        if(separate) {
+            Object.keys(_library || {}).forEach(function(lkey){
+                Object.keys(_library[lkey]).forEach(function(ik){
+                    if(_library[lkey][ik] == "") delete _library[lkey][ik];
+                });
+            });
+        } else {
+            var keys = Object.keys(getBundleKeys());
+            for(let k of keys)
+            {
+                var onlyEmpty = true;
+                for(let l in (_library || {})) {
+                    if(_library[l]?.[k] != "") onlyEmpty = false;                    
+                }
+                if(onlyEmpty){
+                    for(let l in _library || {}) {
+                        delete _library[l]?.[k];
+                    }    
+                }
+            }
+        }        
+        return this;
+    }
+})
+
 // #region FORMATTERS
 
 Object.defineProperty(evalocale, "number", {
@@ -279,7 +307,7 @@ Object.defineProperty(evalocale, "fromCSV", {
     readonly: true,
     value: function(content, config = {delimiter: ";", languages: null,autoformat: true}){        
         var headers = content.split(/\n/g)[0].split(config.delimiter).map(e => e.replace(/\"/g,""));        
-        let chunks = content.split(/\n/g).filter((v,i) => i !== 0 && v != "");        
+        let chunks = content.split(/\n/g).filter((v,i) => i > 0 && v != "");                
         var arr = [];
         for(var ch of chunks) {
             var o = {};
@@ -288,8 +316,8 @@ Object.defineProperty(evalocale, "fromCSV", {
             {
                 o[headers[h]] = isNaN(v[h]) ? v[h] : Number(v[h]);
             }            
-            arr.push(o);
-        }
+            arr.push(o);            
+        }        
         return this.fromArray(arr);
     }
 });
@@ -318,7 +346,7 @@ Object.defineProperty(evalocale, "toArray", {
 
 Object.defineProperty(evalocale, "fromArray", {
     readonly: true,
-    value: function(arr, config = {languages: null}) {
+    value: function(arr, config = {languages: null}) {        
         var languages;        
         if(Array.isArray(config.languages)) languages = languages;
         else {
@@ -331,7 +359,7 @@ Object.defineProperty(evalocale, "fromArray", {
         if(mh.length > 0)
         {
             if(!_metadata) _metadata = {};
-            for(var i=1; i < arr.length; i++)
+            for(var i=0; i < arr.length; i++)
             {
                 _metadata[arr[i]._id] = {};
                 for(let h of mh) {
@@ -343,7 +371,7 @@ Object.defineProperty(evalocale, "fromArray", {
         {            
             for(let l of languages) {
                 if(!_library[l]) _library[l] = {};
-                for(var i=1; i < arr.length; i++)
+                for(var i=0; i < arr.length; i++)
                 {                    
                     _library[l][arr[i]._id] = arr[i][l] || "";
                 }
