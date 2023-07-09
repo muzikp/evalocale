@@ -121,11 +121,14 @@ $$.set(bundle).set(config).set("en-GB")("a1b2", {name: "John Doe"});
 
 ## Methods
 
-| **method** | **description** | **argument** | **argument property** | **required** | **default** | **argument role** |
+| **method** | **description** | **argument** | **argument property** | **type** | **required** | **default** | **argument role** |
 | ---------- | --------------- | ------------ | --------------------- | ------------ | ----------- | ----------------- |
-| generate | Generates an entires bundle, containg dictionaries | config | total | false | 1 | defines how many elements in each dictionary should be created |
-| | | | chars | false | 8 | defines the lenght of a generated key |
-| | | | metadata | false | {} | If not undefined, specifies the schema of metadata; the metadata object is generated with every generated key and a value represented by the schema |
+| deriveMetadata | Generates (or updates) a metadata objec for existing dictionaries. | schema | | Object / Array | false | {} | Specifies the metadata structure. |
+| generate | Generates an entires bundle, containg dictionaries | config | object | total | false | 1 | defines how many elements in each dictionary should be created |
+| | | | chars | UInt | false | 8 | defines the lenght of a generated key |
+| | | | language | String / Array | false | 8 | defines the lenght of a generated key |
+| | | | metadata | Object / Array | false | {} | If not undefined, specifies the schema of metadata; the metadata object is generated with every generated key and a value represented by the schema |
+| syncLanguages | Extends the keys of all language libraries so that they all have the same keys. Ignores existing keys and adds only those that are missing from the given library. | writeValues | | boolean | false | false | If true, assign a non-empty found value for the key from another language where a value is non-empty. |
 
 ## Properties
 
