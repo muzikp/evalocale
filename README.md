@@ -8,8 +8,8 @@ See also evalocale-express for integration in Express.js based applications.
 - easy to setup and use
 - both Node.js and web application
 - Intl module implementation through various formatters
-- automatic environment language recognition
 - metadata support
+- CSV import/export (consider user Edit csv extension for seamless production if you use VSCode)
 
 ## Install
 
@@ -154,7 +154,7 @@ Properties can be get/set by means plain getter/setter, or eventualy by the *set
 | library | Gets or sets the underlying library package, containg all the dictionaries. | - |
 | metadata | Get or sets the underlying metadata package. | - |
 
-The two samples below have the same effects.
+The two examples below have the same effects.
 
 ***Configuration by properties***
 
@@ -167,7 +167,7 @@ $$.language = "en-GB";
 
 ```javascript
 $$.set({
-    alertsOn: false;
+    alertsOn: false,
     language: "en-GB"
 });
 ```
