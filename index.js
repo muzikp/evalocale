@@ -43,22 +43,6 @@ Object.defineProperty(evalocale, "language", {
     }
 });
 
-/**
- * Sets the language property and return itself. Workaround for getter/setter of language if you want to smoothly continue to call other self-returing method.
- * @param {string} language The active language.
- * @returns 
- */
-evalocale.switch = function(language) {
-    if(!_library[language])
-    {
-        _library[language] = {};
-    } else 
-    {
-        _language = language;
-    }
-    return this;
-}
-
 Object.defineProperty(evalocale, "library", {
     readonly: true,
     value: _library
