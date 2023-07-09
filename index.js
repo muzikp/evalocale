@@ -125,7 +125,7 @@ Object.defineProperty(evalocale, "generate", {
  * @param {boolean} writeValues If true, writes the last found value of the given key. Default false.
  * @returns {self} Returns the locale function.
  */
-Object.defineProperty(evalocale, "syncLanguages", {
+Object.defineProperty(evalocale, "sync", {
     readonly: true,
     value: function(writeValues = false){
         var keys = new Map();
@@ -190,7 +190,7 @@ Object.defineProperty(evalocale, "set", {
                     });
                 }
                 if(args[0].alertsOn) _alertsOn = true;
-                if(args[0].sync || args[0].syncLanguages) this.syncLanguages();
+                if(args[0].sync || args[0].sync) this.sync();
                 if(args[0].language) this.language = args[0].language;
             } else if(typeof args[0] == "string") {
                 this.switch(args[0]);

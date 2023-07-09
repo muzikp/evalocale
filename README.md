@@ -137,7 +137,7 @@ $$.set(bundle).set(config).set("en-GB")("a1b2", {name: "John Doe"});
 | | | | metadata | Object | false | {} | Specifies the metadata element. |
 | | | | language | String | false | undefined | Specifies an active language |
 | ***save*** | A counterpart of the *load* method that exports the underlying data. See *load* for output structure. | | | | | |
-| ***syncLanguages*** | Extends the keys of all language libraries so that they all have the same keys. Ignores existing keys and adds only those that are missing from the given library. | writeValues | | boolean | false | false | If true, assign a non-empty found value for the key from another language where a value is non-empty. |
+| ***sync*** | Extends the keys of all language libraries so that they all have the same keys. Ignores existing keys and adds only those that are missing from the given library. | writeValues | | boolean | false | false | If true, assign a non-empty found value for the key from another language where a value is non-empty. |
 | ***toCSV*** | Converts the underlying library and metadata to a single CSV formatted string. | | | | | | |
 | ***toArray*** | Converts the underlying library and metadata to a single Array of key/value pair objects. | | | | | | |
 
