@@ -41,9 +41,13 @@ var $$ = window.evalocale.set("en-Gb", {"a1b2c3d4": "This is {{quality}} library
 console.log($$("a1b2c3d4", {quality: "an ugly"}));
 ```
 
-## Set-up and configuration
+The root function takes two arguments: text code and data object (optional). The data object serves as a container for replacing wildcards, express as {{wildcard}} in a dictionary record (see an example of *quality* above).
+
+## Setting content
 
 Most of the necessary service configuration is possible using the flexible *set* method. It consumes different types and amounts of arguments, while if only one argument is specified, then the language is set if it is a string type, or if it is an object, the configuration of the evalocale environment is performed. If two arguments (or an even number of arguments) are specified, then the odd argument is taken as a language abbreviation and the even argument as an object with dictionary data. In all cases, the root function evalocale is returned.
+
+The *set* method always returns the root function.
 
 ***Setting a single dictionary***
 
@@ -66,7 +70,7 @@ $$.set("cs-CZ", {
 });
 ```
 
-***Loading a bundle***
+***Setting content by loading a bundle***
 
 A bundle is a sort of serializied underlying data, including library, metadata etc. If the first (and one and only) argument is object and contains property *library*, it is considered to be a bundle.
 
@@ -75,7 +79,13 @@ let bundle = {"library":{"cs-CZ":{"a1b2":"Jmenuji se {{name}}.","c3d4":"Je mi {{
 $$.set(bundle);
 ```
 
-***Setting the active language***
+You may also directly load the bundle by the *load* method:
+
+```javascript
+$$.load(bundle);
+```
+
+***Setting an active language***
 
 Setting the active language can be done in several ways, all of which have the same effect:
 
@@ -88,9 +98,9 @@ $$.language = "en-GB";
 $$.switch("en-GB");
 ```
 
-***Calling configuration methods***
+## Configuration
 
-Many configuration methods might be called by the *set* method. Mind that the configuration cannot be mixed with dictionary data.
+Many configuration methods might be called by the *set* method as well as by means of direct methods. While using the *set* method for configuration, mind that the configuration cannot be mixed with dictionary data.
 
 ```javascript
 $$.set({
@@ -106,30 +116,13 @@ let bundle = {"library":{"cs-CZ":{"a1b2":"Jmenuji se {{name}}.","c3d4":"Je mi {{
 var config = {
     metadata: {version: 1, group: "A"},
     sync: true}
-$$.set(bundle).set(config);
+$$.set(bundle).set(config).set("en-GB")("a1b2", {name: "John Doe"});
 ```
 
-### load(bundle)
+## Methods & properties
 
-Load method consumer the entire data bundle, including the library object, metadata object etc. The argument might be also parsable JSON string.
-
-```javascript
-$$.load({
-    "library": {"en-Gb", {"a1b2c3d4": "This is {{quality}} library."}},
-    "metadata": {"a1b2c3d4": {"id": "someID", "app": "someApp", "description": "whatever", "version": 1}},
-    "language": "cs-CZ" //optional    
-});
-```
-
-#### Example
-
-```javascript
-var $$ = require("evalocale");
-$$.set("en-Gb", {"a1b2c3d4": "This is {{quality}} library."}).set("cs-CZ", {"a1b2c3d4": "Toto je {{quality}} knihovna."});
-console.log($$("a1b2c3d4", {quality: "ošklivá"}));
-```
-
-## Properties
+| **property** | **description** | **read** | **write** |
+| default | Gets the environment language. The value is extracted differently for Node.js and browser environment. | true | false |
 
 ### default (readonly)
 
