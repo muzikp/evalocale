@@ -5,11 +5,11 @@ const languages = new Map();
 require("i18n-locales").forEach(l => languages.set(l.toLowerCase(),1));
 let alertsOn;
 
-function language(value) {
+function language(value, returnNullIfNotFound = false) {
     if(languages.get((value || "").toLowerCase())) return value;
     else {        
         if(alertsOn) console.warn("Unknown language code: " + value);
-        return value;
+        return returnNullIfNotFound ? null : value;
     };
 }
 
@@ -25,6 +25,6 @@ module.exports = function(_alertsOn) {
     alertsOn = _alertsOn;    
     return {
         currency: currency,
-        language: language
+        language: language        
     }
 }

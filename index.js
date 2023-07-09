@@ -30,6 +30,8 @@ const evalocale = function() {
     
 };
 
+// #region PROPERTIES
+
 Object.defineProperty(evalocale, "default", {
     readonly: true,
     get: () => getDefaultLocale()
@@ -40,6 +42,13 @@ Object.defineProperty(evalocale, "language", {
     set: function(language) {
         if(!_library[language]) _library[language] = {};
         _language = language;
+    }
+});
+
+Object.defineProperty(evalocale, "alertsOn", {
+    get: () => _alertsOn,
+    set: function(on) {
+        _alertsOn = !!on;
     }
 });
 
@@ -54,6 +63,8 @@ Object.defineProperty(evalocale, "metadata", {
         _metadata = value;
     }
 })
+
+// #endregion
 
 /**
  * Loads a serialized locale bundle into the method's storage.
@@ -201,6 +212,8 @@ Object.defineProperty(evalocale, "set", {
     }
 });
 
+// #region FORMATTERS
+
 Object.defineProperty(evalocale, "number", {
     readonly: true,
     value: function(value, decimals = undefined) {
@@ -242,6 +255,10 @@ Object.defineProperty(evalocale, "diff", {
     }
 });
 
+// #endregion
+
+// #region IO
+
 Object.defineProperty(evalocale, "toCSV", {
     readonly: true,
     value: function(delimiter = "\t"){
@@ -257,14 +274,20 @@ Object.defineProperty(evalocale, "toCSV", {
 
 Object.defineProperty(evalocale, "fromCSV", {
     readonly: true,
-    value: function(delimiter = "\t"){
-        var arr = this.toArray();
-        var str = "";
-        str += Object.keys(arr[0]).map(e => `"${e}"`).join(delimiter) + "\n";
-        for(var i = 1; i < arr.length; i++) {
-            str += Object.keys(arr[0]).map(k => typeof arr[i][k] == "string" ? `"${arr[i][k]}"` : arr[i][k]).join(delimiter) + "\n";            
+    value: function(content, config = {delimiter: ";", languages: null,autoformat: true}){        
+        var headers = content.split(/\n/g)[0].split(config.delimiter).map(e => e.replace(/\"/g,""));        
+        let chunks = content.split(/\n/g).filter((v,i) => i !== 0 && v != "");        
+        var arr = [];
+        for(var ch of chunks) {
+            var o = {};
+            var v = ch.split(config.delimiter).map(e => e.replace(/\"/g,""));
+            for(var h = 0; h < headers.length; h++)
+            {
+                o[headers[h]] = isNaN(v[h]) ? v[h] : Number(v[h]);
+            }            
+            arr.push(o);
         }
-        return str;        
+        return this.fromArray(arr);
     }
 });
 
@@ -276,7 +299,7 @@ Object.defineProperty(evalocale, "toArray", {
         var lh = Object.keys(_library);
         var arr = [];    
         for(let key of keys) {
-            var obj = {id: key};
+            var obj = {_id: key};
             for(let _mh of mh)
             {
                 obj[_mh] = (_metadata || {})[key][_mh]
@@ -289,6 +312,47 @@ Object.defineProperty(evalocale, "toArray", {
         return arr;
     }
 });
+
+Object.defineProperty(evalocale, "fromArray", {
+    readonly: true,
+    value: function(arr, config = {languages: null}) {
+        var languages;        
+        if(Array.isArray(config.languages)) languages = languages;
+        else {
+            languages = Object.keys(arr[0]).filter(h => check(false).language(h, true));
+        }
+        for(let l of languages) {
+            if(_library[l]) _library[l] = {}
+        }
+        var mh = Object.keys(arr[0]).filter(h => languages.indexOf(h) < 0 && h != "_id");
+        if(mh.length > 0)
+        {
+            if(!_metadata) _metadata = {};
+            for(var i=1; i < arr.length; i++)
+            {
+                _metadata[arr[i]._id] = {};
+                for(let h of mh) {
+                    _metadata[arr[i]._id][h] = arr[i][h]
+                }
+            }
+        }
+        if(languages.length > 0)
+        {            
+            for(let l of languages) {
+                if(!_library[l]) _library[l] = {};
+                for(var i=1; i < arr.length; i++)
+                {                    
+                    _library[l][arr[i]._id] = arr[i][l] || "";
+                }
+            }            
+        }        
+        return this;
+    }
+})
+
+// #endregion
+
+// #region UTILS
 
 function getDefaultLocale(){
     if(typeof window !== "undefined") return window?.localStorage?.getItem("language") || window.navigator?.language || window.navigator?.userLanguage || _language;
@@ -333,5 +397,7 @@ const _replace = function(text, data) {
     });
     return text;
 }
+
+// #endregion
 
 module.exports = evalocale;

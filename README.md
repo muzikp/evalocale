@@ -124,6 +124,11 @@ $$.set(bundle).set(config).set("en-GB")("a1b2", {name: "John Doe"});
 | **method** | **description** | **argument** | **argument property** | **type** | **required** | **default** | **argument role** |
 | ---------- | --------------- | ------------ | --------------------- | ------------ | ----------- | ----------------- | ---------|
 | ***deriveMetadata*** | Generates (or updates) a metadata objec for existing dictionaries. | schema | | Object / Array | false | {} | Specifies the metadata structure. |
+| ***fromArray*** | Populates the underlying data with an array of key/value pairs, including languages and metadata. | arr | Array | | true |  | An array containing the library/metadata values. |
+| | | config | languages | Array | false | null | Defines languages present in the arr argument. If empty, the methods tries to identify the languages on its own. |
+| ***fromCSV*** | Populates the underlying data with a CSV style text. It is suggested to use default CSV settings to avoid errors. | content | String | | true |  | A CSV file as a string. |
+| | | config | languages | Array | false | null | Defines languages present in the arr argument. If empty, the methods tries to identify the languages on its own. |language i18n code (e.g. en-GB) |
+| | | | delimiter | String | false | "\t" | Defines the cell delimiter. |
 | ***generate*** | Generates an entires bundle, containg dictionaries | config | object | total | false | 1 | defines how many elements in each dictionary should be created |
 | | | | chars | UInt | false | 8 | defines the lenght of a generated key |
 | | | | language | String / Array | false | 8 | Defines the dictionaries to be generated. It can either be a string or an array of strings representing the language i18n code (e.g. en-GB) |
@@ -140,6 +145,7 @@ $$.set(bundle).set(config).set("en-GB")("a1b2", {name: "John Doe"});
 
 | **property** | **description** | **read** | **write** |
 | ------------ | --------------- | -------- | --------- |
+| alertsOn | Turns on/off console.warn messages. It is recommend to use alertsOn in the development mode to watch possible drawbacks. | true | true |
 | default | Gets the environment language. The value is extracted differently for Node.js and browser environment. | true | false |
 | language | Gets or sets the active language. | true | true |
 | library | Gets the underlying library package, containg all the dictionaries. | true | false |
