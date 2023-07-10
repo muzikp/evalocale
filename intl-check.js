@@ -20,7 +20,11 @@ function currency(value) {
         return value;
     };
 }
-
+/**
+ * @obsolete The module will be gone soon.
+ * @param {*} _alertsOn 
+ * @returns 
+ */
 module.exports = function(_alertsOn) {
     alertsOn = _alertsOn;    
     return {
