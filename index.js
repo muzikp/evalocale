@@ -262,42 +262,42 @@ Object.defineProperty(evalocale, "clean", {
 
 Object.defineProperty(evalocale, "number", {
     readonly: true,
-    value: function(value, decimals = undefined) {
+    value: function(value, decimals = undefined, language) {
         if(decimals !== undefined && decimals < 1) decimals = 1;
-        return new Intl.NumberFormat(_language || _default, { maximumSignificantDigits: decimals }).format(value);
+        return new Intl.NumberFormat(language || _language || _default, { maximumSignificantDigits: decimals }).format(value);
     }
 })
 
 Object.defineProperty(evalocale, "currency", {
     readonly: true,
-    value: function(value, currency = "USD") {
+    value: function(value, currency = "USD", language) {
         currency = check(_alertsOn).currency(currency);
-        return new Intl.NumberFormat(_language || _default, { style: 'currency', currency: currency }).format(value);
+        return new Intl.NumberFormat(language || _language || _default, { style: 'currency', currency: currency }).format(value);
     }
 });
 
 Object.defineProperty(evalocale, "time", {
     readonly: true,
-    value: function(value, short = false) {        
-        return new Intl.DateTimeFormat(_language || _default, {hour: "numeric", minute: "numeric", second: short ? undefined : "numeric", hour12: false }).format(value);
+    value: function(value, short = false, language) {        
+        return new Intl.DateTimeFormat(language ||_language || _default, {hour: "numeric", minute: "numeric", second: short ? undefined : "numeric", hour12: false }).format(value);
     }
 });
 
 Object.defineProperty(evalocale, "date", {
     readonly: true,
-    value: function(value, short = false) {        
-        return new Intl.DateTimeFormat(_language || _default, {year: 'numeric', month: short ? "numeric" : "long", day: 'numeric'}).format(value);
+    value: function(value, short = false, language) {        
+        return new Intl.DateTimeFormat(language || _language || _default, {year: 'numeric', month: short ? "numeric" : "long", day: 'numeric'}).format(value);
     }
 });
 
 Object.defineProperty(evalocale, "diff", {
     readonly: true,
-    value: function(thisTime, thatTime) {                  
+    value: function(thisTime, thatTime, language) {                  
         var diff = new Date(thatTime).getTime() - new Date(thisTime).getTime();
         var d = Math.abs(diff) / 1000;
         var unit = d < 60 ? "second" : d < 60*60 ? "minute" : d < 60*60*24 ? "hour" : d < 60 * 60 * 24 * 31 ? "day" : d < 60 * 60 * 24 * 365 ? "month" : "year";
         diff = unit == "second" ? diff/1000 : unit == "minute" ? diff/(60*1000) : unit == "hour" ? diff/(60*60*1000) : unit == "day" ? diff/(60*1000*60*24) : unit == "month" ? diff/(60*1000*60*24*30) : unit == "year" ? diff/(60*1000*60*24*365) : diff;
-        return new Intl.RelativeTimeFormat(_language || _default, {style: "long", numeric: "auto"}).format(Math.round(diff), unit);
+        return new Intl.RelativeTimeFormat(language || _language || _default, {style: "long", numeric: "auto"}).format(Math.round(diff), unit);
     }
 });
 
