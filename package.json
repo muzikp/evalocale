@@ -1,13 +1,18 @@
 {
   "name": "evalocale",
-  "version": "1.0.3",
-  "description": "",
+  "version": "1.0.4",
+  "description": "Small javascript library for resolving different texts for different languages.",
+  "homepage": "https://github.com/muzikp/evalocale",  
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:commit:push": "webpack --config webpack.config.js && git add . && git commit -m 1.0.3 && git push"
+    "build:commit:push": "webpack --config webpack.config.js && git add . && git commit -m 1.0.4 && git push"
   },
-  "keywords": [],
+  "keywords": [
+    "locale",
+    "i18n",
+    "multilingual"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
