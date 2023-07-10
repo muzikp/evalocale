@@ -24,11 +24,17 @@ Browser webpack compiled package installation:
 <script src="./src/evalocale.min.js">
 ```
 
+Mind that the npmjs version might be obsolete so for Node.js rather use
+
+```npm
+npm instal https://github.com/muzikp/evalocale.git
+```
+
 ## Basic usage
 
 Evalocale is a plain function with three arguments:
 
-- **code**: an id of a concrete text that stored in a dictionary
+- **code**: an id of a concrete text stored in a dictionary
 - **data**: on object of key-value pairs storing dynamic content for the text
 - **language**: optionally you may override the global language property of the function - overriding the language is appropriate if one instance is used by multiple clients, e.g. on an HTTP server
 
