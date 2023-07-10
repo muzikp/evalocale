@@ -1,8 +1,9 @@
 "use strict";
 var rnd = require("randomstring").generate;
+var i18n = require("i18n-locales").filter(e => e).map(e => {return {key: e, code: e.split("-")[0]?.toLowerCase(), region: e.split("-")[1]?.toLowerCase(), script: e.split("-")[2]?.toLowerCase()}});
 var check = require("./intl-check");
 let _library = {};
-let _default = getDefaultLocale();
+let _default = getSystemLocale();
 let _metadata = {};
 let _alertsOn = false;
 let _aliases = {};
@@ -10,10 +11,10 @@ let _language;
 
 const evalocale = function(code, data = {}, language) {    
     if(!code) return "";
-    var _ = dict(language || _language || _default);
+    var _ = dict(language || _default || getSystemLocale());
     if(!_) {
-        if(_alertsOn) console.warn(`Dictionary ${language || _language || _default} not found.`);
-        return ""
+        if(_alertsOn) console.warn(`Dictionary ${language || _default || getSystemLocale()} not found.`);
+        return "";
     };    
     var _text = _[code];        
     if(!_text) return _replace(code,{value: code});
@@ -32,9 +33,17 @@ Object.defineProperty(evalocale, "length", {
     }
 });
 
-Object.defineProperty(evalocale, "default", {
+Object.defineProperty(evalocale, "system", {
     readonly: true,
-    get: () => getDefaultLocale()
+    get: () => getSystemLocale()
+});
+
+Object.defineProperty(evalocale, "default", {    
+    get: () => getSystemLocale(),
+    set: function(value) {
+        if(_library[value] && _alertsOn) console.warn(`Dictionary ${value } does not exist.`);
+        _default = value;
+    }
 });
 
 Object.defineProperty(evalocale, "language", {
@@ -184,21 +193,15 @@ Object.defineProperty(evalocale, "set", {
                     this.load(args[0]);
                     return this;
                 }
-                if(args[0].metadata) this.deriveMetadata(args[0].metadata);
-                if(args[0].default) 
-                {
-                    Object.defineProperty(evalocale, "default", {
-                        get: _default,
-                        set: args[0].default
-                    });
-                }
+                //if(args[0].metadata) this.deriveMetadata(args[0].metadata);
+                if(args[0].default) _default = args[0].default;
                 if(args[0].alertsOn) _alertsOn = true;
-                if(args[0].sync || args[0].sync) this.sync();
-                if(args[0].language) this.language = args[0].language;
+                //if(args[0].sync || args[0].sync) this.sync();
+                //if(args[0].language) this.language = args[0].language;
             } else if(typeof args[0] == "string") {
-                this.switch(args[0]);
+                this.default = args[0];
             } else {
-
+                debugger;
             }
             return this;            
         }
@@ -418,20 +421,80 @@ Object.defineProperty(evalocale, "fromArray", {
 
 // #region UTILS
 
-function dict(nameOrAlias) {
-    if(_library[nameOrAlias]) return _library[nameOrAlias];
+function dict(nameOrAlias, returnKey = false) {    
+    if(_library[nameOrAlias]) return _library[nameOrAlias];      
+    else if(!Array.isArray(nameOrAlias) && typeof nameOrAlias == "object") return guessBestFit(nameOrAlias, returnKey);
     else {
         var matchedAlias = Object.entries(_aliases).find(function([key,value]){            
             if(typeof value == "function") return value(nameOrAlias);
-            else if(Array.isArray(value)) return value.map(e => String(e).toLowerCase()).indexOf(nameOrAlias.toLowerCase()) > -1
+            else if(Array.isArray(value)) return value.map(e => String(e).toLowerCase()).indexOf(nameOrAlias.toLowerCase()) > -1;            
             else if(typeof value == "string") return nameOrAlias.toLowerCase() == value.toLowerCase();
         });
-        if(matchedAlias) return _library[matchedAlias[0]];
-        else return undefined;
+        if(matchedAlias) return returnKey ? matchedAlias[0] :_library[matchedAlias[0]];
+        else return guessBestFit(nameOrAlias, returnKey);
     }
 }
 
-function getDefaultLocale(){
+function guessBestFit(what, returnKey = false) {
+    var code, region, script;
+    var available = Object.keys(_library);
+    if(typeof what == "object")
+    {
+        code = what.code;
+        region = what.region;
+        script = what.script;
+    } else if (typeof what == "string")
+    {
+        let s = what.split(/\-/g).map(e => e.toLowerCase());               
+        if(s.length > 0)
+        {
+            code = s[0];
+            region = s[1];
+            script = s[2];            
+        } else {
+            code = what;
+            region = what;
+            script = what;
+        }
+    } else {
+        if(_alertsOn) console.warn(`The what argument must be either a string (e.g. en-US) or an object, eg {"code": "en", "region": "US"}`);
+        return undefined;
+    }    
+    /* looking for code + region + script */
+    var result = i18n.filter(i => i.code == code && i.region == region && i.script == script);
+    var myKey = available.find(a => result.indexOf(a) > -1)?.map(e => e.key);
+    if(myKey) return returnKey ? myKey : _library[myKey];    
+    else {
+        /* code+region+script not found, looking for code-region */
+        var result = i18n.filter(i => i.code == code && i.region == region);
+        var myKey = available.find(a => result.indexOf(a) > -1)?.map(e => e.key); ;
+        if(myKey) return returnKey ? myKey : _library[myKey];
+        else {
+            /* code+region not found, looking for code */
+            var result = i18n.filter(i => i.code == code)?.map(e => e.key);            
+            var myKey = available.find(a => result.indexOf(a) > -1);                
+            if(myKey) return returnKey ? myKey : _library[myKey];                
+            else {
+               /* code not found, looking for region */
+                var result = i18n.filter(i => i.region == region)?.map(e => e.key);            
+                var myKey = available.find(a => result.indexOf(a) > -1);                    
+                if(myKey) return returnKey ? myKey : _library[myKey];
+                else {
+                    /* region not found, looking for script */
+                    var result = i18n.filter(i => i.script == script)?.map(e => e.key);            
+                    var myKey = available.find(a => result.indexOf(a) > -1);
+                    if(myKey) return returnKey ? myKey : _library[myKey];                    
+                    // if nothing matches, return the first dictionary in the library
+                    // consider rewrite "default" to be the client-defined default language and set system to be the new default
+                    else return returnKey ? this.default || this.system : _library[Object.keys(this.default || this.system)];
+                }
+            }
+        }
+    }
+    debugger;
+}
+
+function getSystemLocale(){
     if(typeof window !== "undefined") return window?.localStorage?.getItem("language") || window.navigator?.language || window.navigator?.userLanguage || _language;
     else return Intl.DateTimeFormat().resolvedOptions().locale;
 }

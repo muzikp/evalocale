@@ -1,11 +1,11 @@
 {
   "name": "evalocale",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:commit:push": "webpack --config webpack.config.js && git add . && git commit -m 1.0.2 && git push"
+    "build:commit:push": "webpack --config webpack.config.js && git add . && git commit -m 1.0.3 && git push"
   },
   "keywords": [],
   "author": "",

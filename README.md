@@ -6,6 +6,7 @@ A core library for Node.js and browsers to facilitate dynamic loading of texts i
 
 - easy to setup and use
 - both Node.js and web application
+- best-fit language lookup
 - Intl module implementation through various formatters
 - metadata support
 - CSV import/export (consider user Edit csv extension for seamless production if you use VSCode)
@@ -180,16 +181,16 @@ $$("someCode", {}, "en-US"); // => returns a resut for en-GB
 
 ## Properties
 
-Properties can be get/set by means plain getter/setter, or eventualy by the *set* method (see bellow).
+Properties can be get/set by means plain getter/setter, or eventualy by the *set* method (see bellow). Only method marked "both" can be configured via the *set* method.
 
-| **property** | **description** | **read only** |
+| **property** | **description** | **type** | **read/write** |
 | ------------ | --------------- | -------- |
-| alertsOn | Turns on/off console.warn messages. It is recommend to use alertsOn in the development mode to watch possible drawbacks. | - |
-| default | Gets the environment language. The value is extracted differently for Node.js and browser environment. | yes |
-| language | Gets or sets the active language. | - |
-| length | Gets the number of entries in the dictionary with the most entries from all dictionaries. Overrides the length property of the base. | yes |
-| library | Gets or sets the underlying library package, containg all the dictionaries. | - |
-| metadata | Get or sets the underlying metadata package. | - |
+| alertsOn | Turns on/off console.warn messages. It is recommend to use alertsOn in the development mode to watch possible drawbacks. | boolean | both |
+| system | Gets the environment language. The value is extracted differently for Node.js and browser environment. | String | read |
+| default | Gets or sets the active language. | String | both |
+| length | Gets the number of entries in the dictionary with the most entries from all dictionaries. Overrides the length property of the base. | UInt | read |
+| library | Gets or sets the underlying library package, containg all the dictionaries. | Object | both |
+| metadata | Get or sets the underlying metadata package. | Object | both |
 
 The two examples below have the same effects.
 
@@ -197,7 +198,7 @@ The two examples below have the same effects.
 
 ```javascript
 $$.alertsOn = false;
-$$.language = "en-GB";
+$$.default = "en-GB";
 ```
 
 ***Configuration by set method***
@@ -205,7 +206,7 @@ $$.language = "en-GB";
 ```javascript
 $$.set({
     alertsOn: false,
-    language: "en-GB"
+    default: "en-GB"
 });
 ```
 
