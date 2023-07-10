@@ -133,4 +133,5 @@ dist
 /bundle.json
 /test.csv
 /test
+/.vscode/*
 /.vscode

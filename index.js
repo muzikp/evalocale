@@ -130,7 +130,7 @@ Object.defineProperty(evalocale, "generate", {
         else if(!Array.isArray(config.language)) config.language = [config.language || getSystemLocale()];
         config.total = isNaN(config.total) || Number(config.total) < 1 ? 1 : Number(config.total);
         config.chars = isNaN(config.chars) || Number(config.chars) < 1 ? _defaultChars : Math.round(Number(config.chars));
-        var items = [...Array(config.total)].map(e => rnd(config.chars));                
+        var items = [...Array(config.total)].map(e => rnd(config.chars));        
         for(let l of config.language) {
             if(!_library[l]) _library[l] = {};
             for(let i of items){

@@ -184,7 +184,7 @@ $$("someCode", {}, "en-US"); // => returns a resut for en-GB
 Properties can be get/set by means plain getter/setter, or eventualy by the *set* method (see bellow). Only method marked "both" can be configured via the *set* method.
 
 | **property** | **description** | **type** | **read/write** |
-| ------------ | --------------- | -------- |
+| ------------ | --------------- | -------- | -------------- |
 | alertsOn | Turns on/off console.warn messages. It is recommend to use alertsOn in the development mode to watch possible drawbacks. | boolean | both |
 | system | Gets the environment language. The value is extracted differently for Node.js and browser environment. | String | read |
 | default | Gets or sets the active language. | String | both |
