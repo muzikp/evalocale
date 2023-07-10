@@ -220,6 +220,16 @@ Instead of generating unique keys, it is easier to let the job up to the package
 var $$ = require("evalocale").generate({total: 500, chars: 8, language: ["en-GB", "cs-CZ"], metadata: {app: "someApp"}});
 ```
 
+You can call the *generate* function without arguments. Default values are
+
+- total: 1
+- chars: default hash length (8 as of July 2023)
+- language: the *system* property value (local system language)
+
+```javascript
+var $$ = require("evalocale").generate();
+```
+
 ### Formatters
 
 The Intl module allows flexible formatting of numbers and data in many languages. Evalocale supports simplified calls for several common user requests. In addition, however, you can use the functions of the Intl module as you wish. The last argument, language, is optional, in case you want to override the global *language* property.

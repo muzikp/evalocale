@@ -1,5 +1,13 @@
 "use strict";
-var rnd = require("randomstring").generate;
+const rnd = (n = 8) => {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let randomString = '';  
+    for (let i = 0; i < n; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      randomString += characters.charAt(randomIndex);
+    }  
+    return randomString;
+};
 var i18n = require("i18n-locales").filter(e => e).map(e => {return {key: e, code: e.split("-")[0]?.toLowerCase(), region: e.split("-")[1]?.toLowerCase(), script: e.split("-")[2]?.toLowerCase()}});
 var check = require("./intl-check");
 let _library = {};
@@ -8,6 +16,7 @@ let _metadata = {};
 let _alertsOn = false;
 let _aliases = {};
 let _language;
+const _defaultChars = 8;
 
 const evalocale = function(code, data = {}, language) {    
     if(!code) return "";
@@ -115,12 +124,13 @@ Object.defineProperty(evalocale, "save", {
 
 Object.defineProperty(evalocale, "generate", {
     readonly: true,
-    value: function(config = {chars: 8, total: 100}) {
-        if(!config.language) throw "At least one language must be specified";
-        else if(!Array.isArray(config.language)) config.language = [config.language];
-        config.total = Number(config.total) < 1 ? 1 : Number(config.total);
-        config.chars = Number(config.chars) < 1 ? 1 : Math.round(Number(config.chars));
-        var items = [...Array(config.total)].map(e => rnd(config.chars));        
+    value: function(config) {      
+        if(typeof config != "object") config = {};
+        if(!config.language) config.language = [getSystemLocale()];
+        else if(!Array.isArray(config.language)) config.language = [config.language || getSystemLocale()];
+        config.total = isNaN(config.total) || Number(config.total) < 1 ? 1 : Number(config.total);
+        config.chars = isNaN(config.chars) || Number(config.chars) < 1 ? _defaultChars : Math.round(Number(config.chars));
+        var items = [...Array(config.total)].map(e => rnd(config.chars));                
         for(let l of config.language) {
             if(!_library[l]) _library[l] = {};
             for(let i of items){
