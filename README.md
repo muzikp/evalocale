@@ -1,7 +1,6 @@
 # Evalocale
 
 A core library for Node.js and browsers to facilitate dynamic loading of texts in different languages.
-See also evalocale-express for integration in Express.js based applications.
 
 ## Key features
 
@@ -26,6 +25,12 @@ Browser webpack compiled package installation:
 ```
 
 ## Basic usage
+
+Evalocale is a plain function with three arguments:
+
+- **code**: an id of a concrete text that stored in a dictionary
+- **data**: on object of key-value pairs storing dynamic content for the text
+- **language**: optionally you may override the global language property of the function - overriding the language is appropriate if one instance is used by multiple clients, e.g. on an HTTP server
 
 ### Node.js
 
@@ -188,15 +193,15 @@ var $$ = require("evalocale").generate({total: 500, chars: 8, language: ["en-GB"
 
 ### Formatters
 
-The Intl module allows flexible formatting of numbers and data in many languages. Evalocale supports simplified calls for several common user requests. In addition, however, you can use the functions of the Intl module as you wish.
+The Intl module allows flexible formatting of numbers and data in many languages. Evalocale supports simplified calls for several common user requests. In addition, however, you can use the functions of the Intl module as you wish. The last argument, language, is optional, in case you want to override the global *language* property.
 
 | **method** |
 
-- **number**(value, decimals): converts a number to a locale string; if decimals are not specified, they are set to auto
-- **currency**(value, currency): converts a number to a locale currency string; the currency code is checked against the list of acceplable currency codes (is not case sensitive)
-- **time**(value, short=false): converts a date instance to time string; if short (default false) is set to true, returns only hours and minutes, otherwise hh:mm:ss
-- **date**(value, short=false): converts a date instance to date string; if short (default false) is set to true, returns only hours and minutes, otherwise hh:mm:ss
-- **diff**(thisTime, thatTime): return a humanized time span between the two dates; the unit is automatically guessed from the size of the difference
+- **number**(value, decimals, language): converts a number to a locale string; if decimals are not specified, they are set to auto
+- **currency**(value, currency, language): converts a number to a locale currency string; the currency code is checked against the list of acceplable currency codes (is not case sensitive)
+- **time**(value, short=false, language): converts a date instance to time string; if short (default false) is set to true, returns only hours and minutes, otherwise hh:mm:ss
+- **date**(value, short=false, language): converts a date instance to date string; if short (default false) is set to true, returns only hours and minutes, otherwise hh:mm:ss
+- **diff**(thisTime, thatTime, language): return a humanized time span between the two dates; the unit is automatically guessed from the size of the difference
 
 ```javascript
 $$.number(65423.12);
