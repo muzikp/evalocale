@@ -253,3 +253,16 @@ $$.date(new Date());
 $$.date(new Date(), true);
 $$.diff(new Date("2023-07-01"),new Date("2023-07-07"));
 ```
+
+### Extension
+
+***Humanize language code***
+
+To render language code in its native or other language, use String prototype extension *getLanguage(target)*.
+
+```javascript
+// If the target argument is empty, the language code itself is taken as the target language.
+var native = "cs-CZ".getLanguage(); // => čeština;
+// Now the same language but in English
+var native = "cs-CZ".getLanguage("en"); // => Czech
+```

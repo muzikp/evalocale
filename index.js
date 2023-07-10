@@ -56,15 +56,6 @@ Object.defineProperty(evalocale, "default", {
     }
 });
 
-Object.defineProperty(evalocale, "language", {
-    get: () => _language,
-    set: function(language) {
-        check(_alertsOn).language(language);
-        if(!_library[language]) _library[language] = {};
-        _language = language;
-    }
-});
-
 Object.defineProperty(evalocale, "alertsOn", {
     get: () => _alertsOn,
     set: function(on) {
@@ -86,11 +77,126 @@ Object.defineProperty(evalocale, "metadata", {
         if(typeof value != "object") throw "Metadata must be an object.";
         else _metadata = value;
     }
-})
+});
 
 // #endregion
 
 // #region METHODS
+
+Object.defineProperty(evalocale, "alias", {
+    readonly: true,
+    value: function(language, codes = []) {
+        if(_aliases[language]) _aliases[language] = [];
+        _aliases[language] = typeof codes == "function" ? codes : Array.isArray(codes) ? codes : [codes];
+        return this;
+    }
+});
+
+Object.defineProperty(evalocale, "clean", {
+    readonly: true,
+    value: function(separate = false){
+        if(separate) {
+            Object.keys(_library || {}).forEach(function(lkey){
+                Object.keys(_library[lkey]).forEach(function(ik){
+                    if(_library[lkey][ik] == "") delete _library[lkey][ik];
+                });
+            });
+        } else {
+            var keys = Object.keys(getBundleKeys());
+            for(let k of keys)
+            {
+                var onlyEmpty = true;
+                for(let l in (_library || {})) {
+                    if(_library[l]?.[k] != "") onlyEmpty = false;                    
+                }
+                if(onlyEmpty){
+                    for(let l in _library || {}) {
+                        delete _library[l]?.[k];
+                    }    
+                }
+            }
+        }        
+        return this;
+    }
+});
+
+Object.defineProperty(evalocale, "closest", {
+    readonly: true,
+    value: function(what, returnDetail = false) {
+        return guessBestFit(what, false);
+    }
+});
+
+Object.defineProperty(evalocale, "create", {
+    readonly: true,
+    value: function(length = 1, chars) {
+        if(Object.keys(_library).length == 0) throw "Cannot create records without at least one dictionary defined.";
+        if(chars === undefined || chars < 2) {
+            var chs = [...Object.keys(_library).map((lkey) => Object.keys(_library[lkey]).map(ikey => ikey.length))].flat();
+            if(chs.length > 0) chars = Math.round(chs.reduce((a,b) => a+b)/chs.length);
+            else chars = 8;
+        }
+        for(var i = 0; i < length; i++) {
+            var _id = rnd(chars);
+            Object.keys(_library).forEach(lkey => _library[lkey][_id] = "");
+        }
+        return this;
+    }
+});
+
+/**
+ * Derives a secondary metadata package based on the keys in the library. Metadata has the same keys as libraries, but their values are objects with properties defined using the schema argument. Metadata is used for a more precise description of individual language records.
+ */
+Object.defineProperty(evalocale, "deriveMetadata", {
+    readonly: true,
+    value: function(schema = {}) {
+        var keys = new Map();
+        Object.keys(_library).forEach(function(libKey){
+            Object.keys(_library[libKey]).forEach(function(itemKey){
+                keys.set(itemKey, "");
+            })
+        });
+        var _schema = {};
+        if(Array.isArray(schema)) {
+            for(let s of schema) {
+                _schema[s] = ""
+            }            
+        }
+        else if (typeof schema == "object") _schema = schema;
+        [...keys.keys()].forEach(function(key){
+            _metadata[key] = _schema;
+        });
+        return this;
+    }
+});
+
+Object.defineProperty(evalocale, "dictionary", {
+    readonly: true,
+    value: function(nameOrAlias) {
+        return dict(nameOrAlias)
+    }
+});
+
+Object.defineProperty(evalocale, "generate", {
+    readonly: true,
+    value: function(config) {      
+        if(typeof config != "object") config = {};
+        if(!config.language) config.language = [getSystemLocale()];
+        else if(!Array.isArray(config.language)) config.language = [config.language || getSystemLocale()];
+        config.total = isNaN(config.total) || Number(config.total) < 1 ? 1 : Number(config.total);
+        config.chars = isNaN(config.chars) || Number(config.chars) < 1 ? _defaultChars : Math.round(Number(config.chars));
+        var items = [...Array(config.total)].map(e => rnd(config.chars));        
+        for(let l of config.language) {
+            if(!_library[l]) _library[l] = {};
+            for(let i of items){
+                _library[l][i] = ""
+            }
+        }
+        if(config.metadata) this.deriveMetadata(config.metadata)
+        return this;
+    }
+});
+
 Object.defineProperty(evalocale, "load", {
     readonly: true,
     value: function() {
@@ -120,76 +226,6 @@ Object.defineProperty(evalocale, "save", {
             metadata: _metadata,
             language: _language || this.default
         }
-    }
-})
-
-Object.defineProperty(evalocale, "generate", {
-    readonly: true,
-    value: function(config) {      
-        if(typeof config != "object") config = {};
-        if(!config.language) config.language = [getSystemLocale()];
-        else if(!Array.isArray(config.language)) config.language = [config.language || getSystemLocale()];
-        config.total = isNaN(config.total) || Number(config.total) < 1 ? 1 : Number(config.total);
-        config.chars = isNaN(config.chars) || Number(config.chars) < 1 ? _defaultChars : Math.round(Number(config.chars));
-        var items = [...Array(config.total)].map(e => rnd(config.chars));        
-        for(let l of config.language) {
-            if(!_library[l]) _library[l] = {};
-            for(let i of items){
-                _library[l][i] = ""
-            }
-        }
-        if(config.metadata) this.deriveMetadata(config.metadata)
-        return this;
-    }
-});
-
-/**
- * Extends the keys of all language libraries so that they all have the same keys. Ignores existing keys and adds only those that are missing from the given library.
- * @param {boolean} writeValues If true, writes the last found value of the given key. Default false.
- * @returns {self} Returns the locale function.
- */
-Object.defineProperty(evalocale, "sync", {
-    readonly: true,
-    value: function(writeValues = false){
-        var keys = new Map();
-        Object.keys(_library).forEach(function(libKey){
-            Object.keys(_library[libKey]).forEach(function(itemKey){
-                keys.set(itemKey, writeValues ? _library[libKey][itemKey] : "");
-            })
-        });            
-        
-        [...keys.keys()].forEach(function(key){                 
-            Object.keys(_library).forEach(function(libKey){                                
-                if(_library[libKey][key] === undefined) _library[libKey][key] = writeValues ? keys.get(key) : "";                
-            });
-        });
-        return this;
-    }
-})
-
-/**
- * Derives a secondary metadata package based on the keys in the library. Metadata has the same keys as libraries, but their values are objects with properties defined using the schema argument. Metadata is used for a more precise description of individual language records.
- */
-Object.defineProperty(evalocale, "deriveMetadata", {
-    readonly: true,
-    value: function(schema = {}) {
-        var keys = new Map();
-        Object.keys(_library).forEach(function(libKey){
-            Object.keys(_library[libKey]).forEach(function(itemKey){
-                keys.set(itemKey, "");
-            })
-        });
-        var _schema = {};
-        if(Array.isArray(schema)) {
-            for(let s of schema) {
-                _schema[s] = ""
-            }            
-        }
-        else if (typeof schema == "object") _schema = schema;
-        [...keys.keys()].forEach(function(key){
-            _metadata[key] = _schema;
-        });
-        return this;
     }
 })
 
@@ -229,71 +265,27 @@ Object.defineProperty(evalocale, "set", {
     }
 });
 
-Object.defineProperty(evalocale, "alias", {
+/**
+ * Extends the keys of all language libraries so that they all have the same keys. Ignores existing keys and adds only those that are missing from the given library.
+ * @param {boolean} writeValues If true, writes the last found value of the given key. Default false.
+ * @returns {self} Returns the locale function.
+ */
+Object.defineProperty(evalocale, "sync", {
     readonly: true,
-    value: function(language, codes = []) {
-        if(_aliases[language]) _aliases[language] = [];
-        _aliases[language] = typeof codes == "function" ? codes : Array.isArray(codes) ? codes : [codes];
-        return this;
-    }
-});
-
-Object.defineProperty(evalocale, "dictionary", {
-    readonly: true,
-    value: function(nameOrAlias) {
-        return dict(nameOrAlias)
-    }
-});
-
-Object.defineProperty(evalocale, "create", {
-    readonly: true,
-    value: function(length = 1, chars) {
-        if(Object.keys(_library).length == 0) throw "Cannot create records without at least one dictionary defined.";
-        if(chars === undefined || chars < 2) {
-            var chs = [...Object.keys(_library).map((lkey) => Object.keys(_library[lkey]).map(ikey => ikey.length))].flat();
-            if(chs.length > 0) chars = Math.round(chs.reduce((a,b) => a+b)/chs.length);
-            else chars = 8;
-        }
-        for(var i = 0; i < length; i++) {
-            var _id = rnd(chars);
-            Object.keys(_library).forEach(lkey => _library[lkey][_id] = "");
-        }
-        return this;
-    }
-})
-
-Object.defineProperty(evalocale, "clean", {
-    readonly: true,
-    value: function(separate = false){
-        if(separate) {
-            Object.keys(_library || {}).forEach(function(lkey){
-                Object.keys(_library[lkey]).forEach(function(ik){
-                    if(_library[lkey][ik] == "") delete _library[lkey][ik];
-                });
+    value: function(writeValues = false){
+        var keys = new Map();
+        Object.keys(_library).forEach(function(libKey){
+            Object.keys(_library[libKey]).forEach(function(itemKey){
+                keys.set(itemKey, writeValues ? _library[libKey][itemKey] : "");
+            })
+        });            
+        
+        [...keys.keys()].forEach(function(key){                 
+            Object.keys(_library).forEach(function(libKey){                                
+                if(_library[libKey][key] === undefined) _library[libKey][key] = writeValues ? keys.get(key) : "";                
             });
-        } else {
-            var keys = Object.keys(getBundleKeys());
-            for(let k of keys)
-            {
-                var onlyEmpty = true;
-                for(let l in (_library || {})) {
-                    if(_library[l]?.[k] != "") onlyEmpty = false;                    
-                }
-                if(onlyEmpty){
-                    for(let l in _library || {}) {
-                        delete _library[l]?.[k];
-                    }    
-                }
-            }
-        }        
+        });
         return this;
-    }
-});
-
-Object.defineProperty(evalocale, "closest", {
-    readonly: true,
-    value: function(what, returnDetail = false) {
-        return guessBestFit(what, false);
     }
 })
 
@@ -346,7 +338,7 @@ Object.defineProperty(evalocale, "diff", {
 
 Object.defineProperty(evalocale, "toCSV", {
     readonly: true,
-    value: function(delimiter = "\t"){
+    value: function(delimiter = ";"){
         var arr = this.toArray();
         var str = "";
         str += Object.keys(arr[0]).map(e => `"${e}"`).join(delimiter) + "\n";
@@ -371,7 +363,7 @@ Object.defineProperty(evalocale, "fromCSV", {
                 o[headers[h]] = isNaN(v[h]) ? v[h] : Number(v[h]);
             }            
             arr.push(o);            
-        }        
+        };        
         return this.fromArray(arr);
     }
 });
@@ -521,6 +513,15 @@ const _replace = function(text, data) {
     });
     return text;
 }
+
+String.prototype.getLanguage = function(target) {
+    try {
+        const displayNames = new Intl.DisplayNames([target || this], { type: 'language' });    
+        return displayNames.of(this);
+    } catch (error) {        
+        return this;
+    }
+};
 
 // #endregion
 
