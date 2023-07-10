@@ -9,6 +9,7 @@ const rnd = (n = 8) => {
     return randomString;
 };
 var i18n = require("i18n-locales").filter(e => e).map(e => {return {key: e, code: e.split("-")[0]?.toLowerCase(), region: e.split("-")[1]?.toLowerCase(), script: e.split("-")[2]?.toLowerCase()}});
+var parser = require("accept-language-parser");
 var check = require("./intl-check");
 let _library = {};
 let _default = getSystemLocale();
@@ -291,8 +292,8 @@ Object.defineProperty(evalocale, "clean", {
 
 Object.defineProperty(evalocale, "closest", {
     readonly: true,
-    value: function(what) {
-        return guessBestFit(what, true)
+    value: function(what, detail = true) {
+        return guessBestFit(what, false, detail)
     }
 })
 
@@ -452,7 +453,11 @@ function dict(nameOrAlias, returnKey = false) {
     }
 }
 
-function guessBestFit(what, returnKey = false) {
+function guessBestFit(what) {
+
+}
+
+function guessBestFit(what, returnKey = false, returnDetail = false) {
     var code, region, script;
     var available = Object.keys(_library);
     if(typeof what == "object")
@@ -480,35 +485,57 @@ function guessBestFit(what, returnKey = false) {
     /* looking for code + region + script */
     var result = i18n.filter(i => i.code == code && i.region == region && i.script == script);
     var myKey = available.find(a => result.indexOf(a) > -1)?.map(e => e.key);
-    if(myKey) return returnKey ? myKey : _library[myKey];    
+    if(myKey) return wrapGuessBestFit(myKey, [code,region,script], returnKey, returnDetail, result);    
     else {
         /* code+region+script not found, looking for code-region */
         var result = i18n.filter(i => i.code == code && i.region == region);
-        var myKey = available.find(a => result.indexOf(a) > -1)?.map(e => e.key); ;
-        if(myKey) return returnKey ? myKey : _library[myKey];
+        var myKey = available.find(a => result?.map(e => e.key).indexOf(a) > -1);
+        if(myKey) return wrapGuessBestFit(myKey, [code,region,script], returnKey, returnDetail, result);    
         else {
             /* code+region not found, looking for code */
-            var result = i18n.filter(i => i.code == code)?.map(e => e.key);            
-            var myKey = available.find(a => result.indexOf(a) > -1);                
-            if(myKey) return returnKey ? myKey : _library[myKey];                
+            var result = i18n.filter(i => i.code == code);            
+            var myKey = available.find(a => result?.map(e => e.key).indexOf(a) > -1);            
+            if(myKey) return wrapGuessBestFit(myKey, [code,region,script], returnKey, returnDetail, result);    
             else {
                /* code not found, looking for region */
                 var result = i18n.filter(i => i.region == region)?.map(e => e.key);            
-                var myKey = available.find(a => result.indexOf(a) > -1);                    
-                if(myKey) return returnKey ? myKey : _library[myKey];
+                var myKey = available.find(a => result?.map(e => e.key).indexOf(a) > -1);
+                if(myKey) return wrapGuessBestFit(myKey, [code,region,script], returnKey, returnDetail, result);    
                 else {
                     /* region not found, looking for script */
                     var result = i18n.filter(i => i.script == script)?.map(e => e.key);            
                     var myKey = available.find(a => result.indexOf(a) > -1);
-                    if(myKey) return returnKey ? myKey : _library[myKey];                    
-                    // if nothing matches, return the first dictionary in the library
-                    // consider rewrite "default" to be the client-defined default language and set system to be the new default
+                    if(myKey) return wrapGuessBestFit(myKey, [code,region,script], returnKey, returnDetail, result);    
+                    // if nothing matches, return the first dictionary in the library                    
                     else return returnKey ? this.default || this.system : _library[Object.keys(this.default || this.system)];
                 }
             }
         }
     }
     debugger;
+}
+
+function wrapGuessBestFit(suggested, chunks, returnKey, returnDetail, options){
+    if(returnDetail) {        
+        let scores = options.map(function(o){
+            var codeScore = chunks[0] === o.code ? 0.5 : 0;
+            var regionScore = chunks[1] === o.region ? 0.4 : 0;
+            var scriptScore = chunks[2] === o.script ? 0.1 : 0;
+            debugger;
+            o.score = codeScore + regionScore + scriptScore;
+            return {key: o.key, score: o.score};
+        });
+        debugger;
+        var result = {
+            suggested: suggested,
+            options: scores
+        };
+
+    }
+    else if(returnKey) 
+    {
+        return suggested;
+    } else return _library[suggested]
 }
 
 function getSystemLocale(){
