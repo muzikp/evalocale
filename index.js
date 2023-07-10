@@ -292,8 +292,8 @@ Object.defineProperty(evalocale, "clean", {
 
 Object.defineProperty(evalocale, "closest", {
     readonly: true,
-    value: function(what, detail = true) {
-        return guessBestFit(what, false, detail)
+    value: function(what, returnDetail = false) {
+        return guessBestFit(what, false);
     }
 })
 
@@ -449,93 +449,33 @@ function dict(nameOrAlias, returnKey = false) {
             else if(typeof value == "string") return nameOrAlias.toLowerCase() == value.toLowerCase();
         });
         if(matchedAlias) return returnKey ? matchedAlias[0] :_library[matchedAlias[0]];
-        else return guessBestFit(nameOrAlias, returnKey);
-    }
-}
-
-function guessBestFit(what) {
-
-}
-
-function guessBestFit(what, returnKey = false, returnDetail = false) {
-    var code, region, script;
-    var available = Object.keys(_library);
-    if(typeof what == "object")
-    {
-        code = what.code;
-        region = what.region;
-        script = what.script;
-    } else if (typeof what == "string")
-    {
-        let s = what.split(/\-/g).map(e => e.toLowerCase());               
-        if(s.length > 0)
-        {
-            code = s[0];
-            region = s[1];
-            script = s[2];            
-        } else {
-            code = what;
-            region = what;
-            script = what;
-        }
-    } else {
-        if(_alertsOn) console.warn(`The what argument must be either a string (e.g. en-US) or an object, eg {"code": "en", "region": "US"}`);
-        return undefined;
-    }    
-    /* looking for code + region + script */
-    var result = i18n.filter(i => i.code == code && i.region == region && i.script == script);
-    var myKey = available.find(a => result.indexOf(a) > -1)?.map(e => e.key);
-    if(myKey) return wrapGuessBestFit(myKey, [code,region,script], returnKey, returnDetail, result);    
-    else {
-        /* code+region+script not found, looking for code-region */
-        var result = i18n.filter(i => i.code == code && i.region == region);
-        var myKey = available.find(a => result?.map(e => e.key).indexOf(a) > -1);
-        if(myKey) return wrapGuessBestFit(myKey, [code,region,script], returnKey, returnDetail, result);    
         else {
-            /* code+region not found, looking for code */
-            var result = i18n.filter(i => i.code == code);            
-            var myKey = available.find(a => result?.map(e => e.key).indexOf(a) > -1);            
-            if(myKey) return wrapGuessBestFit(myKey, [code,region,script], returnKey, returnDetail, result);    
-            else {
-               /* code not found, looking for region */
-                var result = i18n.filter(i => i.region == region)?.map(e => e.key);            
-                var myKey = available.find(a => result?.map(e => e.key).indexOf(a) > -1);
-                if(myKey) return wrapGuessBestFit(myKey, [code,region,script], returnKey, returnDetail, result);    
-                else {
-                    /* region not found, looking for script */
-                    var result = i18n.filter(i => i.script == script)?.map(e => e.key);            
-                    var myKey = available.find(a => result.indexOf(a) > -1);
-                    if(myKey) return wrapGuessBestFit(myKey, [code,region,script], returnKey, returnDetail, result);    
-                    // if nothing matches, return the first dictionary in the library                    
-                    else return returnKey ? this.default || this.system : _library[Object.keys(this.default || this.system)];
-                }
-            }
-        }
+            var bestFit = guessBestFit(nameOrAlias, false);
+            return returnKey ? bestFit :_library[bestFit];
+        } 
     }
-    debugger;
 }
 
-function wrapGuessBestFit(suggested, chunks, returnKey, returnDetail, options){
-    if(returnDetail) {        
-        let scores = options.map(function(o){
-            var codeScore = chunks[0] === o.code ? 0.5 : 0;
-            var regionScore = chunks[1] === o.region ? 0.4 : 0;
-            var scriptScore = chunks[2] === o.script ? 0.1 : 0;
-            debugger;
-            o.score = codeScore + regionScore + scriptScore;
-            return {key: o.key, score: o.score};
+function guessBestFit(what, returnDetails = false) {    
+    var langs = parser.parse(what);
+    var scores = [];
+    langs.forEach(function(x){
+        var _scores = Object.keys(_library).map(function(k) {
+            var score = 0;
+            var s = k.split(/\-/g).map(e => e?.toLowerCase());
+            if(s[0] === x.code?.toLowerCase()) score += 0.5;
+            if(s[1] === x.region?.toLowerCase()) score += 0.4;
+            if(s[2] === x.region?.toLowerCase()) score += 0.1;        
+            return {
+                key: k,
+                score: score * x.quality
+            }
         });
-        debugger;
-        var result = {
-            suggested: suggested,
-            options: scores
-        };
-
-    }
-    else if(returnKey) 
-    {
-        return suggested;
-    } else return _library[suggested]
+        scores.push(..._scores);
+    });    
+    scores = scores.sort((a,b) => a.score < b.score ? 1 : a.score > b.score ? -1 : 0);
+    if(returnDetails) return scores;
+    else return scores[0].key;    
 }
 
 function getSystemLocale(){
