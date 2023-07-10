@@ -5,14 +5,16 @@ let _library = {};
 let _default = getDefaultLocale();
 let _metadata = {};
 let _alertsOn = false;
+let _aliases = {};
 let _language;
+
 const evalocale = function(code, data = {}, language) {    
-    let _ = _library[language || _language || _default] || _library[(Object.keys(_library) || [])[0]] || {};    
     if(!code) return "";
-    else if(typeof code == "object") {
-        var _text = _default ? code[_default] : Object.entries(code)[0][1];
-        return _replace(_text, data)
-    }
+    var _ = dict(language || _language || _default);
+    if(!_) {
+        if(_alertsOn) console.warn(`Dictionary ${language || _language || _default} not found.`);
+        return ""
+    };    
     var _text = _[code];        
     if(!_text) return _replace(code,{value: code});
     else {
@@ -213,6 +215,22 @@ Object.defineProperty(evalocale, "set", {
     }
 });
 
+Object.defineProperty(evalocale, "alias", {
+    readonly: true,
+    value: function(language, codes = []) {
+        if(_aliases[language]) _aliases[language] = [];
+        _aliases[language] = typeof codes == "function" ? codes : Array.isArray(codes) ? codes : [codes];
+        return this;
+    }
+});
+
+Object.defineProperty(evalocale, "dictionary", {
+    readonly: true,
+    value: function(nameOrAlias) {
+        return dict(nameOrAlias)
+    }
+});
+
 Object.defineProperty(evalocale, "create", {
     readonly: true,
     value: function(length = 1, chars) {
@@ -399,6 +417,19 @@ Object.defineProperty(evalocale, "fromArray", {
 // #endregion
 
 // #region UTILS
+
+function dict(nameOrAlias) {
+    if(_library[nameOrAlias]) return _library[nameOrAlias];
+    else {
+        var matchedAlias = Object.entries(_aliases).find(function([key,value]){            
+            if(typeof value == "function") return value(nameOrAlias);
+            else if(Array.isArray(value)) return value.map(e => String(e).toLowerCase()).indexOf(nameOrAlias.toLowerCase()) > -1
+            else if(typeof value == "string") return nameOrAlias.toLowerCase() == value.toLowerCase();
+        });
+        if(matchedAlias) return _library[matchedAlias[0]];
+        else return undefined;
+    }
+}
 
 function getDefaultLocale(){
     if(typeof window !== "undefined") return window?.localStorage?.getItem("language") || window.navigator?.language || window.navigator?.userLanguage || _language;

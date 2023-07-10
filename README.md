@@ -134,6 +134,8 @@ $$.set(bundle).set(config).set("en-GB")("a1b2", {name: "John Doe"});
 
 | **method** | **description** | **argument** | **argument property** | **type** | **required** | **default** | **argument role** |
 | ---------- | --------------- | ------------ | --------------------- | ------------ | ----------- | ----------------- | ---------|
+| ***alias*** | Sets the alias(es) for a particular language and returns itself. | nameOrAlias | | String | true | | Specifies the key under which the entire dictionary is stored (typically, e.g. en-GB). |
+| | | resolver | | String / Array / Function | | [] | The resolver is used to compare aliases with the dictionary's own key. It can be a string (eg "en"), an array (eg ["en", "en-GB", "en-US"]) or a function (eg (value) => value.substr(0, 2) == "en"). |
 | ***clean*** | Deletes entries with an empty value from dictionaries. Deletion can be done in two ways. If the *separate* argument is true, it deletes all empty entries from each dictionary (regardless of whether the same entry in another dictionary is not empty). If false, deletes only those records that are empty across all dictionaries.| separate | | boolean | false | false | If true, removes blank entries in each dictionary regardless of value of the same key in other dictionaries. If false (default), removes only entries with keys of empty value across all dictionaries. |
 | ***create*** | Appends N new records to each dictionary. Metadata ignored so far | length | | UInt | false | 1 | Number (N) of records to be generated. |
 | | | chars | | UInt | false | - | The length of a key. If not specified, either average length of existing keys is calculated, or (if no records exists) is set to 8. |
@@ -155,6 +157,26 @@ $$.set(bundle).set(config).set("en-GB")("a1b2", {name: "John Doe"});
 | ***sync*** | Extends the keys of all language libraries so that they all have the same keys. Ignores existing keys and adds only those that are missing from the given library. | writeValues | | boolean | false | false | If true, assign a non-empty found value for the key from another language where a value is non-empty. |
 | ***toCSV*** | Converts the underlying library and metadata to a single CSV formatted string. | | | | | | |
 | ***toArray*** | Converts the underlying library and metadata to a single Array of key/value pair objects. | | | | | | |
+
+### Examples
+
+***Setting language aliases***
+
+It makes sense to use some dictionaries for multiple languages (or a combination of languages and regions, e.g. en-GB to be used for en-US, etc.). The alias method makes it possible to extend the validity of the dictionary for other regions or languages, using the so-called resolver.
+
+```javascript
+// define the library content
+// then create an aliases
+$$.alias("en-GB", ["en-US", "en-AU", "en-BZ"]);
+$$("someCode", {}, "en-AU"); // => returns a resut for en-GB
+$$("someCode", {}, "en-NZ"); // => returns an empty string as no alias is mathcing
+//this might get too long, so better like this:
+$$.alias("en-GB", (langCode) => langCode.substr(0,2) == "en");
+$$("someCode", {}, "en-XXX"); // => returns a resut for en-GB
+//even a single resolver as a alias string might be used:
+$$.alias("en-GB", "en-US");
+$$("someCode", {}, "en-US"); // => returns a resut for en-GB
+```
 
 ## Properties
 
