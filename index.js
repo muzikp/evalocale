@@ -287,6 +287,13 @@ Object.defineProperty(evalocale, "clean", {
         }        
         return this;
     }
+});
+
+Object.defineProperty(evalocale, "closest", {
+    readonly: true,
+    value: function(what) {
+        return guessBestFit(what, true)
+    }
 })
 
 // #region FORMATTERS
