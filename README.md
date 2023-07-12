@@ -4,8 +4,10 @@ A core library for Node.js and browsers to facilitate dynamic loading of texts i
 
 ## Key features
 
-- easy to setup and use  
-- both Node.js and web application
+- easy to setup and use
+- CLI for Node.js
+- mustache.js-like wildcards
+- Node.js + web apps
 - best-fit language lookup
 - Intl module implementation through various formatters
 - metadata support
@@ -44,6 +46,12 @@ Evalocale is a plain function with three arguments:
 ```js
 var $$ = require("evalocale").set("en-Gb", {"a1b2c3d4": "This is {{quality}} library."});
 console.log($$("a1b2c3d4", {quality: "an ugly"}));
+```
+
+### CLI
+
+```npx
+npx evalocale generate -t 500 -c 8 -m '["id", "description"]' -f csv -n myEvalocaleLibrary
 ```
 
 ### Browser
