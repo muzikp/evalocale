@@ -2,7 +2,7 @@
   "name": "evalocale",
   "version": "1.0.4",
   "description": "Small javascript library for resolving different texts for different languages.",
-  "homepage": "https://github.com/muzikp/evalocale",  
+  "homepage": "https://github.com/muzikp/evalocale",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -13,10 +13,14 @@
     "i18n",
     "multilingual"
   ],
+  "bin": {
+    "evalocale": "./cli.js"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "accept-language-parser": "^1.5.0",
+    "commander": "^11.0.0",
     "i18n-locales": "^0.0.5"
   },
   "devDependencies": {

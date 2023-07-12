@@ -4,7 +4,7 @@ A core library for Node.js and browsers to facilitate dynamic loading of texts i
 
 ## Key features
 
-- easy to setup and use
+- easy to setup and use  
 - both Node.js and web application
 - best-fit language lookup
 - Intl module implementation through various formatters
