@@ -16,7 +16,12 @@ const $$ = require("evalocale")({alertsOn: process.env.NODE_ENV == "development"
 2. Set the evalocale express middleware to be used
 
 ```javascript
-app.use($$.express)
+//using defaults
+app.use($$.express());
+//or setting your own preferences
+app.use($$.express({
+    forceChoice: true
+}));
 ```
 
 If you want to use the language selection widget, you have to first install it to your "views" folder:

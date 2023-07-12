@@ -32,7 +32,7 @@ Browser webpack compiled package installation:
 Mind that the npmjs version might be obsolete so for Node.js rather use
 
 ```npm
-npm instal https://github.com/muzikp/evalocale.git
+npm install https://github.com/muzikp/evalocale.git
 ```
 
 ## Basic usage
