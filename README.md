@@ -2,6 +2,8 @@
 
 A core library for Node.js and browsers to facilitate dynamic loading of texts in different languages.
 
+## **THIS PACK IS UNDER DEVELOPMENT AND IS FOR EXPERIMENTAL PURPOSES ONLY UNTIL FURTHER NOTICE**
+
 ## Key features
 
 - easy to setup and use
