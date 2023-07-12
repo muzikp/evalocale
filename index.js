@@ -438,6 +438,48 @@ module.exports = function(config = {}) {
 
     // #endregion
 
+    // #region EXTENSIONS
+    Object.defineProperty(evalocale, "express", {
+        readonly: true,
+        value: function(req, res, next) {
+            if(req.cookies.evalang) {
+                req.evalang = req.cookies.evalang;
+                res.locals.$$ = getProxy(req.evalang);        
+                next();        
+            } else
+            {        
+                var bestFit = $$.closest(req.get("Accept-Language"));
+                if(bestFit)
+                {
+                    req.evalang = bestFit;
+                    res.cookie("evalang", bestFit);
+                    res.locals.$$ = getProxy(req.evalang);
+                    next();
+                }
+                else {
+                    debugger;
+                }        
+            }
+            function getProxy(language) {
+                var f = function(code, data) {
+                    return evalocale(code,data,language)
+                }
+                f.languages = Object.keys(evalocale.library);
+                f.default = language;
+                f.number = function(value, decimals) {
+                    return evalocale.number(value, decimals, language);
+                }
+                f.currency = function(value, currency) {
+                    return evalocale.number(value, currency, language);
+                }
+                f.diff = function(thisTime, thatTime) {
+                    return evalocale.diff(thisTime, thatTime, language);
+                }    
+                return f;
+            }
+        }
+    })
+
     // #region UTILS
 
     function dict(nameOrAlias, returnKey = false) {    

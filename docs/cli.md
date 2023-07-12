@@ -1,6 +1,6 @@
 # Evalocale CLI
 
-## Basic usage
+A number of functions that can be called via the evalocale API can more meaningfully be called via the CLI - for example generating input bundles. At the same time, the CLI makes the generation of dictionary libraries more pleasant, as the generated CSV files can be automatically tracked and converted to JSON.
 
 ## Generating a libary
 
@@ -29,3 +29,23 @@ npx evalocale generate -h
 | **-p** | path (directory) where the file is to be saved | String | *workspace* |
 | **-w** | for CSV files only: watch any changes and parse it as a JSON file of the same name | boolean | false |
 | **-h** | suprisingly...a help command | - | - |
+
+## Watching changes
+
+At the moment, tracking changes is mainly (more precisely, only) tracking changes in CSV files.
+
+```npx
+npx evolocale watch <filePath>
+```
+
+To unwatch a file:
+
+```npx
+npx evolocale unwatch <filePath>
+```
+
+And to unwatch all files just:
+
+```npx
+npx evolocale unwatch
+```
