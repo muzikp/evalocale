@@ -515,56 +515,6 @@ module.exports = function(config = {}) {
         return obj;
     }
 
-    function fromCSV(content, config = {delimiter: ";", languages: null, autoformat: true}){        
-        var headers = content.split(/\n/g)[0].split(config.delimiter).map(e => e.replace(/\"/g,""));        
-        let chunks = content.split(/\n/g).filter((v,i) => i > 0 && v != "");                
-        var arr = [];
-        for(var ch of chunks) {
-            var o = {};
-            var v = ch.split(config.delimiter).map(e => e.replace(/\"/g,""));
-            for(var h = 0; h < headers.length; h++)
-            {
-                o[headers[h]] = isNaN(v[h]) ? v[h] : Number(v[h]);
-            }            
-            arr.push(o);            
-        };        
-        return fromArray(arr);
-    }
-
-    function fromArray(arr, config = {languages: null}) {        
-        var result = {}, __library ={}, __metadata = {};
-        var languages;        
-        if(Array.isArray(config.languages)) languages = languages;
-        else {
-            languages = Object.keys(arr[0]).filter(h => check(false).language(h, true));
-        }
-        for(let l of languages) {
-            if(__library[l]) __library[l] = {}
-        }
-        var mh = Object.keys(arr[0]).filter(h => languages.indexOf(h) < 0 && h != "_id");
-        if(mh.length > 0)
-        {        
-            for(var i=0; i < arr.length; i++)
-            {
-                __metadata[arr[i]._id] = {};
-                for(let h of mh) {
-                __metadata[arr[i]._id][h] = arr[i][h]
-                }
-            }
-        }
-        if(languages.length > 0)
-        {            
-            for(let l of languages) {
-                if(!__library[l]) _library[l] = {};
-                for(var i=0; i < arr.length; i++)
-                {                    
-                    __library[l][arr[i]._id] = arr[i][l] || "";
-                }
-            }            
-        }        
-        return {library: __library, metadata: __metadata};
-    }
-
     const _replace = function(text, data) {
         var keys = (text.match(/\{\{(.*?)\}\}/g) || []).map(i => i.match(/\{\{(.*)\}\}/)[1]);
         keys.forEach(function(k){

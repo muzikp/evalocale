@@ -44,7 +44,7 @@ Evalocale is a plain function with three arguments:
 ### Node.js
 
 ```js
-var $$ = require("evalocale").set("en-Gb", {"a1b2c3d4": "This is {{quality}} library."});
+var $$ = require("evalocale")().set("en-Gb", {"a1b2c3d4": "This is {{quality}} library."});
 console.log($$("a1b2c3d4", {quality: "an ugly"}));
 ```
 
@@ -57,7 +57,7 @@ npx evalocale generate -t 500 -c 8 -m '["id", "description"]' -f csv -n myEvaloc
 ### Browser
 
 ```js
-var $$ = window.evalocale.set("en-Gb", {"a1b2c3d4": "This is {{quality}} library."});
+var $$ = window.evalocale().set("en-Gb", {"a1b2c3d4": "This is {{quality}} library."});
 console.log($$("a1b2c3d4", {quality: "an ugly"}));
 ```
 

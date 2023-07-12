@@ -3,7 +3,7 @@
 const { program } = require('commander');
 const fs = require('fs');
 const path = require('path');
-const $$ = require("./index");
+const $$ = require("./index")({alertsOn: true});
 
 program
   .version('1.0.0')
@@ -35,7 +35,7 @@ program
         fs.writeFileSync(_path, content);
         console.log(`- evalocale file ${name} created`);
         if(!config.watch && format == "csv") {
-            watchCSV(_path);
+            watchCSV(_path, name);
         }
         
     } catch(e) {
@@ -44,18 +44,28 @@ program
     }    
 });
 
-function watchCSV(filePath) {
+function watchCSV(filePath, fileName) {
     console.log(`- watching file ${filePath} for changes`);
-    fs.watchFile(filePath, (curr, prev) => {
-        var _$$ = new $$;
-        console.log(_$$);
-        if (curr.mtime > prev.mtime) {            
-            var csv = fs.readFileSync(filePath);            
-            var json = $$.fromCSV(csv).save();
-            console.log(`File ${filePath} has been modified`);    
+    
+        fs.watchFile(filePath, (curr, prev) => {
+            var _$$ = require("./index.js")();        
+            if (curr.mtime > prev.mtime) {      
+                try {      
+                var csv = fs.readFileSync(filePath).toString();                
+                var json = _$$.fromCSV(csv, {delimiter: ";"}).save();
+                const directory = path.dirname(filePath);                
+                const file = path.parse( path.basename(filePath)).name;   
+                var _path = `${directory}/${file}..json`;
+                console.log("Saving to " + _path)
+                fs.writeFileSync(_path, JSON.stringify(json, null, "\t"));
+            } catch(e) {
+                console.warn(e);
+            }
         }
     });
 }
+    
+
 
 program.parse(process.argv);
 
