@@ -35,17 +35,17 @@ npx evalocale generate -h
 At the moment, tracking changes is mainly (more precisely, only) tracking changes in CSV files.
 
 ```npx
-npx evolocale watch <filePath>
+npx evalocale watch <filePath>
 ```
 
 To unwatch a file:
 
 ```npx
-npx evolocale unwatch <filePath>
+npx evalocale unwatch <filePath>
 ```
 
 And to unwatch all files just:
 
 ```npx
-npx evolocale unwatch
+npx evalocale unwatch
 ```

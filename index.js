@@ -478,7 +478,7 @@ module.exports = function(config = {}) {
                     }
                     f.diff = function(thisTime, thatTime) {
                         return evalocale.diff(thisTime, thatTime, language);
-                    }    
+                    }                      
                     return f;
                 }
             }
@@ -521,9 +521,9 @@ module.exports = function(config = {}) {
             });
             scores.push(..._scores);
         });    
-        scores = scores.sort((a,b) => a.score < b.score ? 1 : a.score > b.score ? -1 : 0);
+        scores = scores.sort((a,b) => a.score < b.score ? 1 : a.score > b.score ? -1 : 0);        
         if(returnDetails) return scores;
-        else return scores[0].key;    
+        else return scores[0]?.key;    
     }
 
     function getSystemLocale(){

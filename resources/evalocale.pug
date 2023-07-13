@@ -1,0 +1,62 @@
+link(rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@6.6.6/css/flag-icons.min.css")
+.evalocale-select
+	button#evalocale-toggle.btn-evalocale
+		.content
+			.flag
+				-var css = "fi fis fi-" + $$.default.substr(3,2).toLowerCase(); 
+				span(class=css)
+			.text !{$$.default.substr(0,2).getLanguage()}
+	#evalocale-container
+		for l in $$.languages
+			button.btn-evalocale(data-evalocale=l)
+				.content
+					.flag
+						-var css = "fi fis fi-" + l.substr(3,2).toLowerCase(); 
+						span(class=css)
+					.text !{l.substr(0,2).getLanguage()}
+script.
+	document.getElementById("evalocale-toggle").addEventListener("click", function(){
+		var container = document.getElementById("evalocale-container");
+		if (container.style.display === 'none') {
+			container.style.display = 'block';			
+			container.offsetHeight;
+			container.style.transform = 'translateY(100%)';
+		} else {
+			container.style.transform = 'none'; // Reset the transform
+			container.style.display = 'none'; // Hide the container
+		}
+	});
+	var buttons = document.querySelectorAll(".btn-evalocale");
+	buttons.forEach((button) => {
+		button.addEventListener('click', function () {
+			// Code to execute when the button is clicked
+			console.log('Button clicked!');
+		});
+	});
+style.
+	.evalocale-select {
+		.content {
+			display: flex;
+			padding: 5px;
+			align-items: center;
+			.text {
+				margin-left: 1rem;
+			}
+		}
+		.btn-evalocale {
+			display: block;
+			border: none;
+			background-color: white;
+		}
+		.fi {
+			width: 1.5rem;
+			height: 1.5rem;
+			border-radius: 50%;
+			border: lightgray solid 1px;
+		}
+		#evalocale-container {
+			display: none;
+			transition: 0.5s;		
+		}
+	}
+	

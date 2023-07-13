@@ -1,8 +1,14 @@
 # Evalocale Express.js extension
 
-Express.js is a popular back-end framework. Evalocale extension enables seamless language recognition and rendering with a two lines.
+Express.js is a popular back-end framework. Evalocale extension enables seamless language recognition and rendering with a two lines. It also provides with a pug template for client-side user selection.
 
-1. Insert somewhere at the beginning of the app.js
+1. Optional: install the language selelector (a pug template)
+
+```npx
+npx evalocale install express
+```
+
+2. Insert somewhere at the beginning of the app.js
 
 ```javascript
 //with no config
@@ -13,7 +19,7 @@ const $$ = require("evalocale")({alertsOn: process.env.NODE_ENV == "development"
 const $$ = require("evalocale")({alertsOn: process.env.NODE_ENV == "development"}).fromCSVfile(\<csv file path>);
 ```
 
-2. Set the evalocale express middleware to be used
+3. Set the evalocale express middleware to be used
 
 ```javascript
 //using defaults
@@ -24,14 +30,6 @@ app.use($$.express({
 }));
 ```
 
-If you want to use the language selection widget, you have to first install it to your "views" folder:
+```pug
 
-```npx
-npx evalocale install pug 
-```
-
-If you use another directory for the pug views, specify the path:
-
-```npx
-npx evalocale install pug -p "./my-views/"
 ```
