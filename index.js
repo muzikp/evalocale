@@ -227,6 +227,13 @@ module.exports = function(config = {}) {
         }
     });
 
+    Object.defineProperty(evalocale, "random", {
+        readonly: true,
+        value: function(length = 8) {
+            return rnd(length);
+        }
+    })
+
     Object.defineProperty(evalocale, "save", {
         readonly: true,
         value: function(){        

@@ -2,18 +2,12 @@
 
 A number of functions that can be called via the evalocale API can more meaningfully be called via the CLI - for example generating input bundles. At the same time, the CLI makes the generation of dictionary libraries more pleasant, as the generated CSV files can be automatically tracked and converted to JSON.
 
-## Generating a libary
+## Create a file
 
-The **generate* command creates a new file prepopulated with languages, keys and (eventually metadata). The file can be either JSON or CSV, depends on what is easier to edit for you.
+The **create* command creates a new file prepopulated with languages, keys and metadata. The file can be either JSON or CSV, depends on what is easier to edit for you.
 
-```npx
-npx evalocale generate -t 500 -c 8 -m '["id", "description"]' -f csv -n myEvalocaleLibrary -w
-```
-
-For quick help just type
-
-```npx
-npx evalocale generate -h
+```bash
+ npx evalocale create -m description:string -l cs-cZ -l en-GB -n startup -f csv -t 100
 ```
 
 ### Arguments
@@ -22,19 +16,47 @@ npx evalocale generate -h
 | --- | --- | --- | --- |
 | **-t** | total of elements (records) to be generated | UInt | 10 |
 | **-c** | number of hash (text code) characters | UInt | 8 |
-| **-l** | language(s) to be generated | Array\<of String> | *system language* |
-| **-m** | metadata schema (an array of headers) | Array\<of String> | - |
+| **-l** | language(s) to be generated | String | *system language* |
+| **-m** | metadata schema (an array of headers) | String | - |
 | **-f** | format of the file (csv or json) | String | json |
 | **-n** | name of the file to be saved | String | evalocale |
 | **-p** | path (directory) where the file is to be saved | String | *workspace* |
 | **-w** | for CSV files only: watch any changes and parse it as a JSON file of the same name | boolean | false |
 | **-h** | suprisingly...a help command | - | - |
 
+#### Metadata config
+
+For better orientation in dictionaries, it is useful to use metadata that is stored in a separate object. Metadata can be described by name, type and default value when creating or expanding a file. Accepted types are string, number and boolean (case insensitive).
+
+**Name only**
+
+```bash
+-m someName
+```
+
+**Name and type**
+
+```bash
+-m someName:string
+```
+
+**Name and default**
+
+```bash
+-m someName=some value
+```
+
+**Name, type and default**
+
+```bash
+-m someName:string=some value
+```
+
 ## Watching changes
 
 At the moment, tracking changes is mainly (more precisely, only) tracking changes in CSV files.
 
-```npx
+```bash
 npx evalocale watch <filePath>
 ```
 
