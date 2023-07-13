@@ -135,3 +135,4 @@ dist
 /test
 /.vscode/*
 /.vscode
+/evalocale.config.json

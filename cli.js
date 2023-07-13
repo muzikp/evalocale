@@ -20,7 +20,7 @@ program
   .option('-n, --name <string>', 'The name of the bundle')
   .option('-p, --path <string>', 'Directory to save the file to (default evalocale.json or evalocale.csv')
   .option('-w, --no-watch', 'Starts watching a CSV file for changes and automatically converts it to a JSON file')
-  .description('Generates an Evalocale bundle and saves it to the specified destination (default ./)')
+  .description('Generates an Evalocale bundle file/')
   .action(function() {
     try {
         var config = arguments[0];
@@ -44,6 +44,15 @@ program
     }    
 });
 
+// INIT
+program
+  .command('init')
+  .description('Initialize the CLI processes')
+  .action(() => {
+    init();
+  });
+
+// INSTALL
 program
   .command('install <what>')
   .description('Install an Evalocale extension')
@@ -78,20 +87,19 @@ program
     else console.log("- unknown service: " + what)
   });
 
-function watchCSV(filePath, fileName) {
-    console.log(`- watching file ${filePath} for changes`);
-    
-        fs.watchFile(filePath, (curr, prev) => {
-            var _$$ = require("./index.js")();        
-            if (curr.mtime > prev.mtime) {      
-                try {      
+function watchCSV(filePath) {
+    console.log(`- watching file ${filePath} for changes`);    
+    fs.watchFile(filePath, (curr, prev) => {
+        var _$$ = require("./index.js")();        
+        if (curr.mtime > prev.mtime) {      
+            try {      
                 var csv = fs.readFileSync(filePath).toString();                
                 var json = _$$.fromCSV(csv, {delimiter: ";"}).save();
                 const directory = path.dirname(filePath);                
                 const file = path.parse( path.basename(filePath)).name;   
-                var _path = `${directory}/${file}..json`;
-                console.log("Saving to " + _path)
+                var _path = `${directory}/${file}..json`;                
                 fs.writeFileSync(_path, JSON.stringify(json, null, "\t"));
+                updateWatch(filePath);
             } catch(e) {
                 console.warn(e);
             }
@@ -99,7 +107,39 @@ function watchCSV(filePath, fileName) {
     });
 }
     
+function init(){
+    try {
+        var cfPath = path.join(__dirname, 'evalocale.config.json');                        
+        fs.exists(cfPath, (exists) => {
+            var config = {
+                watch: []
+            };
+            if (exists) config = JSON.parse(fs.readFileSync(cfPath).toString());
+            for(let w of config.watch) {
+                try {
+                    watchCSV(w);
+                } catch(e) {
+                    config.watch = config.watch.filter(_w => _w !== w);
+                }
+            }
+            fs.writeFileSync(cfPath, JSON.stringify(config))``
+        });            
+    } catch (e) {
 
+    }
+}
+
+function updateWatch(filePath) {
+    var cfPath = path.join(__dirname, 'evalocale.config.json');                        
+    fs.exists(cfPath, (exists) => {
+        var config = {
+            watch: []
+        };
+        if (exists) config = JSON.parse(fs.readFileSync(cfPath).toString());
+        config.watch.push(filePath);
+        fs.writeFileSync(cfPath, JSON.stringify(config));
+    });        
+}
 
 program.parse(process.argv);
 

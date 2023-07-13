@@ -2,18 +2,19 @@
 
 A core library for Node.js and browsers to facilitate dynamic loading of texts in different languages.
 
-## **THIS PACK IS UNDER DEVELOPMENT AND IS FOR EXPERIMENTAL PURPOSES ONLY UNTIL FURTHER NOTICE**
+## **THIS PACKAGE IS UNDER DEVELOPMENT AND IS FOR EXPERIMENTAL PURPOSES ONLY UNTIL FURTHER NOTICE**
 
 ## Key features
 
 - easy to setup and use
-- CLI for Node.js
-- mustache.js-like wildcards
+- [Node CLI](./docs/cli.md)
+- mustache-like wildcards
 - Node.js + web apps
 - best-fit language lookup
 - Intl module implementation through various formatters
 - metadata support
 - CSV import/export (consider user Edit csv extension for seamless production if you use VSCode)
+- hands-on [Express](./docs/express.md) middleware and pug template
 
 ## Install
 
