@@ -24,7 +24,9 @@ The **create* command creates a new file prepopulated with languages, keys and m
 | **-w** | for CSV files only: watch any changes and parse it as a JSON file of the same name | boolean | false |
 | **-h** | suprisingly...a help command | - | - |
 
-#### Language arguments -l
+## General argument information
+
+### Language arguments -l
 
 It is recommended to use any of the standard language codifications (ISO 639-1 etc.) to avoid drawbacks.
 
@@ -34,7 +36,7 @@ You can use multiple language arguments. If none is defined, the language of you
 -l cz-CZ -l en -l en-GB
 ```
 
-#### Metadata arguments -m
+### Metadata arguments -m
 
 For better orientation in dictionaries, it is useful to use metadata that is stored in a separate object. Metadata can be described by name, type and default value when creating or expanding a file. Accepted types are string, number and boolean (case insensitive).
 
@@ -83,3 +85,9 @@ And to unwatch all files just:
 ```npx
 npx evalocale unwatch
 ```
+
+## Backlog
+
+- add **remove** command
+- add **clean** command to remove unused keys/languages/metadata
+- add **connect** command to connect to various sources (Excel, Google Spreadsheets etc.)

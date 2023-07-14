@@ -5,15 +5,21 @@ const fs = require('fs');
 const path = require('path');
 const $$ = require("./index")({alertsOn: true});
 const _langs = new Map();
+console.msg = function() {
+    console.log("\x1b[33m", ...arguments);
+}
+Array.prototype.distinct = function() {
+    var m = new Map();
+    this.forEach(e => m.set(e,1));
+    return [...m.keys()];
+}
 require("i18n-locales").forEach(l => _langs.set(l.toLowerCase(),l));
 
 program
   .version('1.0.0')
   .description('Evalocale CLI command');
 
-
-  program
-  .command("create")  
+program.command("create")  
   .option('-t, --total <count>', 'Number of records to be generated (default 10)')
   .option('-c, --chars <length>', 'Length of a text key (default 8)')
   .option('-m, --metadata <Array>', 'Metadata attribute to add.', collectMetadata, [])
@@ -43,29 +49,31 @@ program
         {
             bundle.library[l] = {};            
             keys.forEach(function(k){
-                bundle.library[l] = "";
+                bundle.library[l][k] = "";
             });
         }
         if(metadata.length > 0) {
             var md = {};
-            for(let m of metadata) {
-                md[m.name] = md[m.def];
-            }
-            keys.forEach(function(k){
-                
+            for(let m of metadata) {                      
+                md[m.name] = m.def;
+            }            
+            keys.forEach(function(k){                     
                 bundle.metadata[k] = md;
             });            
         }
-        bundle.language = Object.keys(bundle.library)[0];
+        bundle.language = Object.keys(bundle.library)[0];        
         var content = format == "csv" ? $$.load(bundle).toCSV() : JSON.stringify(bundle, null, "\t");        
         fs.writeFileSync(_path, content);
-        console.log(`- evalocale file ${name} created`);
+        modifyConfig(function(config){
+            config.default = _path;
+            return config;
+        });
+        console.msg(`- evalocale file ${name} created and set as default`);
         if(!config.watch && format == "csv") {
             watchCSV(_path, name);
         }        
     } catch(e) {
-        console.error("type npx evalocale create -h for a help")
-        console.error(e);
+        console.error("type npx evalocale create -h for a help", e)        
     }    
 });
 
@@ -97,9 +105,10 @@ function collectMetadata(value, metadata) {
     if(["string", "number", "boolean"].indexOf(type) < 0) throw `Unknown type ${type} for property ${name}`;
     if(type == "number" && def !== undefined) def = Number(def);
     if(type == "boolean" && def !== undefined) def = def == "true" ? true : def == "false" ? false : undefined;
-    metadata.push({name: name, type: type, default: def});
+    if(type == "string" && def === undefined) def = "";
+    metadata.push({name: name, type: type, def: def});
     return metadata;
-  }
+}
 
   function collectLanguage(value = "", language) {
     var standardized = _langs.get(value.trim().toLowerCase());
@@ -108,41 +117,56 @@ function collectMetadata(value, metadata) {
         language.push(value)
     } else language.push(standardized);
     return language;
-  }
+}
 
-// generate
-program
-  .command("generate")  
-  .option('-t, --total <count>', 'Number of records to be generated (default 10)')
-  .option('-c, --chars <length>', 'Length of a text key (default 8)')
-  .option('-m, --metadata <data>', 'Metadata schema as an array of headers (default ["id","description"])')
-  .option('-l, --language <data>', 'Language(s) to be created')
-  .option('-f, --format <string>', 'Output format: either json (default) or csv')
-  .option('-n, --name <string>', 'The name of the bundle')
-  .option('-p, --path <string>', 'Directory to save the file to (default evalocale.json or evalocale.csv')
-  .option('-w, --no-watch', 'Starts watching a CSV file for changes and automatically converts it to a JSON file')
-  .description('Generates an Evalocale bundle file')
+program.command("add")  
+  .option('-r, --rows <count>', 'Number of records to be added (default 1)')
+  .option('-c, --chars <length>', 'Length of a text key (default: an average lenght of existing keys)')
+  .option('-m, --metadata <Array>', 'Metadata attribute(s) to add.', collectMetadata, [])
+  .option('-l, --language <Array>', 'Language(s) to add', collectLanguage, [])
+  .option('-s, --source <string>', 'Path to the file to be modified')  
+  .description('Creates an evalocale file')
   .action(function() {
     try {
         var config = arguments[0];
-        var total = Math.round(Number(config.total)) > 0 ? Math.round(Number(config.total)) : 10;
-        var chars = Math.round(Number(config.chars)) > 0 ? Math.round(Number(config.chars)) : 8;
-        var metadata = config.metadata;
-        var _$$ = $$.generate({total: total, chars: chars, metadata: metadata, language: config.language});
-        var format = ["json","csv"].indexOf(config.format?.toLowerCase().trim()) < 0 ? "json" : config.format;
-        var name = config.name || "evalocale";
-        var _path = config.path ? `${config.path}/${name}.${format}` : path.join(process.cwd(), `${name}.${format}`);
-        var content = format == "csv" ? $$.toCSV() : JSON.stringify($$.save(), null, "\t");
-        fs.writeFileSync(_path, content);
-        console.log(`- evalocale file ${name} created`);
-        if(!config.watch && format == "csv") {
-            watchCSV(_path, name);
-        }
-        
+        modifyFile(config.source, function(content){            
+            var rows = Math.round(Number(config.rows || 0)) > 0 ? Math.round(Number(config.rows)) : 0;
+            var chars = Math.round(Number(config.chars || 0)) > 0 ? Math.round(Number(config.chars)) : (function(){
+                var l = Object.keys(content.library || {})[0];
+                if(l) {
+                var ls = Object.keys(content.library[l]).map(k => k.length);
+                if(ls.length > 0) return ls.reduce((a,b) => a+b)/ls.length;
+                else return 8;
+                } else return 8
+            })();            
+            var metadata = config.metadata || [];              
+            var keys = [...getCurrentKeys(content), ...[...Array(rows)].map(e => $$.random(chars))].distinct();            
+            var langs = new Map();
+            [...Object.keys(content.library), ...config.language].forEach(k => langs.set(k,1));
+            [...langs.keys()].forEach(function(l){                
+                if(!content.library[l]) content.library[l] = {};
+                keys.forEach(k => !content.library[l][k] ? content.library[l][k] = "" : true);                
+            })
+            if(content.metadata) {
+                var schema = {};
+                getCurrentMetaAttrs(content).forEach((m) => schema[m] = "");
+                keys.forEach(k => !content.metadata[k] ? content.metadata[k] = schema : true);                
+            }
+            if(config.metadata.length > 0 && rows > 0) {
+                for(let m of config.metadata) {
+                    Object.keys(content.metadata).forEach(function(mk){
+                        content.metadata[mk][m.name] = m.default;
+                    });
+                }
+            }
+            console.msg(`- elements add to ${config.source}`);
+            return content;
+        });        
     } catch(e) {
-        console.error("type npx evalocale generate -h for a help")
+        console.error("type npx evalocale create -h for a help", e)
         console.error(e);
-    }    
+    }
+        
 });
 
 // INIT
@@ -189,7 +213,7 @@ program
   });
 
 function watchCSV(filePath) {
-    console.log(`- watching file ${filePath} for changes`);    
+    console.msg(`- watching file ${filePath} for changes`);    
     fs.watchFile(filePath, (curr, prev) => {
         var _$$ = require("./index.js")();        
         if (curr.mtime > prev.mtime) {      
@@ -240,6 +264,69 @@ function updateWatch(filePath) {
         config.watch.push(filePath);
         fs.writeFileSync(cfPath, JSON.stringify(config));
     });        
+}
+
+function modifyFile(filePath, action) {    
+    if(!filePath) {        
+        try {
+            var _default = JSON.parse(fs.readFileSync(path.join(__dirname, 'evalocale.config.json')).toString()).default;
+            if(_default) filePath = _default;
+        } catch(e) {
+            console.error(e);
+        }
+    }
+    //if(!config.source) throw "Source argument cannot be emty.";
+    var format = path.extname(filePath).replace(/\./g,"");
+    var content;
+    try {
+        if(format == "csv")
+        {
+            content = $$.fromCSV(fs.readFileSync(filePath).toString()).save();
+        }
+        else if(format == "json")
+        {
+            content = JSON.parse(fs.readFileSync(filePath));
+        }
+        else throw ("Unsupported file format: " + format);
+    } catch(e) {
+        console.error(e);
+    }
+    if(typeof content == "object") {
+        content = action(content);
+        if(format == "csv") fs.writeFileSync(filePath, $$.load(content).toCSV());
+        else fs.writeFileSync(filePath, JSON.stringify(content, null, "\t"));
+    } else 
+    {
+        console.log("The content is not an object", content);
+    }
+}
+
+function modifyConfig(action = function(config){return config}) {
+    try {
+        var config = JSON.parse(fs.readFileSync(path.join(__dirname, 'evalocale.config.json')).toString());
+        config = action(config);
+        fs.writeFileSync(path.join(__dirname, 'evalocale.config.json'), JSON.stringify(config, null, "\t"));
+    } catch(e) {
+        console.log("Failed to modify config: ", e);
+    }
+}
+
+function getCurrentKeys(bundle) {
+    var map = new Map();
+    for(let l of Object.keys(bundle?.analysis || {}))
+    {
+        Object.keys(bundle.analysis[l]).forEach(k => map.set(k,1));
+    }
+    Object.keys(bundle?.metadata || {}).forEach(k => map.set(k,1));    
+    return [...map.keys()];
+}
+
+function getCurrentMetaAttrs(bundle) {
+    var map = new Map();
+    Object.keys(bundle?.metadata || {}).forEach(function(key){
+        Object.keys(bundle?.metadata?.[key]).forEach(k => map.set(k,1));
+    })
+    return [...map.keys()];
 }
 
 program.parse(process.argv);
