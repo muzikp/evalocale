@@ -464,7 +464,7 @@ const context = function (config = {}) {
             try {
                 fs = eval("require")("fs");
             } catch(e) {
-                throw "Bind method is not supported in the browser environment.";
+                throw "Evalocale bind method is not supported in the browser environment.";
             }            
             var format = path.extname(filePath).replace(/\./g,"");
             if(["json","csv"].indexOf(format?.trim().toLowerCase()) < 0) throw "Unsupported file type: " + format;
