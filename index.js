@@ -442,6 +442,14 @@ module.exports = function(config = {}) {
     // #endregion
 
     // #region EXTENSIONS
+/*
+    Object.defineProperty(evalocale, "bind", {
+        readonly: true,
+        value: function(filePath) {
+            var fs = require("fs");
+        }
+    })
+*/
     Object.defineProperty(evalocale, "express", {
         readonly: true,
         value: function(config) {            
