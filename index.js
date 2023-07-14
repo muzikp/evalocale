@@ -459,9 +459,13 @@ const context = function (config = {}) {
 
     Object.defineProperty(evalocale, "bind", {
         readonly: true,
-        value: function(filePath) {
-            if(typeof require === undefined || typeof require != "function") throw "Bind method is not supported in the browser environment.";
-            var fs = eval("require")("fs");
+        value: function(filePath) {            
+            var fs;
+            try {
+                fs = eval("require")("fs");
+            } catch(e) {
+                throw "Bind method is not supported in the browser environment.";
+            }            
             var format = path.extname(filePath).replace(/\./g,"");
             if(["json","csv"].indexOf(format?.trim().toLowerCase()) < 0) throw "Unsupported file type: " + format;
             var c = fs.readFileSync(filePath).toString();
