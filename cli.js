@@ -12,7 +12,8 @@ const path = require('path');
 const $$ = require("./index")({alertsOn: true});
 const _langs = new Map();
 console.msg = function() {
-    console.log("\x1b[33m", ...arguments);
+    //console.log("\x1b[33m", ...arguments);
+    console.log(...arguments);
 }
 Array.prototype.distinct = function() {
     var m = new Map();

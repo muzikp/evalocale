@@ -1,6 +1,6 @@
 link(rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@6.6.6/css/flag-icons.min.css")
 .evalocale-select
-	button#evalocale-toggle.btn-evalocale
+	button#evalocale-toggle.btn-evalocale(data-evalocale = $$.default)
 		.content
 			.flag
 				-var css = "fi fis fi-" + $$.default.substr(3,2).toLowerCase(); 
@@ -17,24 +17,48 @@ link(rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@6.6.6/c
 script.
 	document.getElementById("evalocale-toggle").addEventListener("click", function(){
 		var container = document.getElementById("evalocale-container");
-		if (container.style.display === 'none') {
-			container.style.display = 'block';			
-			container.offsetHeight;
-			container.style.transform = 'translateY(100%)';
+		var containerStyle = getComputedStyle(container);
+
+		if (containerStyle.display === 'none') {
+			container.style.display = 'block';
+			container.style.transform = 'translateY(0%)';
 		} else {
 			container.style.transform = 'none'; // Reset the transform
 			container.style.display = 'none'; // Hide the container
 		}
 	});
+	// hide container on click is out of target
+	document.addEventListener('click', function(event) {
+		var select = document.querySelector('.evalocale-select');
+		var target = event.target;
+		if (select.contains(target)) return;
+		else {
+			var container = document.getElementById("evalocale-container");
+			container.style.transform = 'none';
+			container.style.display = 'none';
+		}		
+	});
 	var buttons = document.querySelectorAll(".btn-evalocale");
 	buttons.forEach((button) => {
 		button.addEventListener('click', function () {
-			// Code to execute when the button is clicked
-			console.log('Button clicked!');
-		});
+			var evalangValue = this.getAttribute("data-evalocale");
+			var original = document.getElementById("evalocale-toggle").getAttribute("data-evalocale");
+			if(evalangValue == original) return false;
+			if (evalangValue) {
+				document.cookie = "evalang=" + evalangValue + ";path=/";
+				var event = new CustomEvent('evalocale.changed', { 
+					detail: {selected: evalangValue, original: original},
+					cancelable: true
+				});
+				window.dispatchEvent(event);
+			}			
+		});		
 	});
 style.
-	.evalocale-select {
+	body {
+		background-color: lightgray;
+	}
+	.evalocale-select {		
 		.content {
 			display: flex;
 			padding: 5px;
@@ -47,6 +71,7 @@ style.
 			display: block;
 			border: none;
 			background-color: white;
+			cursor: pointer;
 		}
 		.fi {
 			width: 1.5rem;
@@ -56,7 +81,18 @@ style.
 		}
 		#evalocale-container {
 			display: none;
-			transition: 0.5s;		
+			transition: 15s;
+			display: none;
+			transform: translateY(0%);
+			max-width: fit-content;
 		}
 	}
-	
+script.
+	window.addEventListener('evalocale.changed', function(event) {
+				if (event.defaultPrevented) return;
+		else {
+			var container = document.getElementById("evalocale-container");
+			container.style.transform = 'none';
+			container.style.display = 'none';
+		}
+	});
