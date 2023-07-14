@@ -9,6 +9,7 @@ const rnd = (n = 8) => {
     return randomString;
 };
 var i18n = require("i18n-locales").filter(e => e).map(e => {return {key: e, code: e.split("-")[0]?.toLowerCase(), region: e.split("-")[1]?.toLowerCase(), script: e.split("-")[2]?.toLowerCase()}});
+const path = require('path');
 var parser = require("accept-language-parser");
 var check = require("./intl-check");
 
@@ -447,6 +448,7 @@ module.exports = function(config = {}) {
         readonly: true,
         value: function(filePath) {
             var fs = eval("require")("fs");
+            var format = path.extname(filePath).replace(/\./g,"");
         }
     })
 
