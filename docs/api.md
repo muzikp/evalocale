@@ -30,6 +30,8 @@ $$.alias("en-GB", (language) => language.substr(0,2) == "en");
 
 ### clean
 
+Removes unused keys from dictionaries and metadata.
+
 ## Properties
 
 Properties can be get/set by means plain getter/setter, or eventualy by the *set* method (see bellow). Only method marked "both" can be configured via the *set* method.

@@ -1,5 +1,11 @@
 #!/usr/bin/env node
 
+/*
+clear
+npx evalocale create -t 5 -c 4 -m description:string -l cs-CZ -l en-GB -n testify -f csv
+npx evalocale add -r 5 -l sk-SR -m variace:string=NIC
+*/
+
 const { program } = require('commander');
 const fs = require('fs');
 const path = require('path');
@@ -169,6 +175,46 @@ program.command("add")
         
 });
 
+program.command("clean")    
+  .option('-s, --source <string>', 'Path to the file to be cleaned')  
+  .option('-i, --no-independent', 'Clean independently (remove empty no matter they have assigned a non-empty value in another dictionary/metadata.')  
+  .description('Clean empty keys across dictionaries/metadata (where there is no assigned value to the key in all the resources).')
+  .action(function() {
+    try {
+        var config = arguments[0];
+        modifyFile(config.source, function(content){            
+            if(!config.independent) {
+                Object.keys(_library || {}).forEach(function(lkey){
+                    Object.keys(_library[lkey]).forEach(function(ik){
+                        if(_library[lkey][ik] == "") delete _library[lkey][ik];
+                    });
+                });
+            } else {
+                var keys = Object.keys(getBundleKeys());
+                for(let k of keys)
+                {
+                    var onlyEmpty = true;
+                    for(let l in (_library || {})) {
+                        if(_library[l]?.[k] != "") onlyEmpty = false;                    
+                    }
+                    if(onlyEmpty){
+                        for(let l in _library || {}) {
+                            delete _library[l]?.[k];
+                        }    
+                    }
+                }
+            }        
+            return this;
+            console.msg(`- elements add to ${config.source}`);
+            return content;
+        });        
+    } catch(e) {
+        console.error("type npx evalocale create -h for a help", e)
+        console.error(e);
+    }
+        
+});
+
 // INIT
 program
   .command('init')
@@ -202,7 +248,7 @@ program
                 const sourceFilePath = path.join(__dirname, "resources", "evalocale.pug");
                 const targetFilePath = path.join(process.cwd(), 'views', 'evalocale.pug');
                 fs.copyFileSync(sourceFilePath, targetFilePath);
-                console.log("- Evalocale Express.js extension initialized, see https://github.com/muzikp/evalocale/blob/main/docs/express.md for further information.")
+                console.msg("- Express.js extension initialized, see https://github.com/muzikp/evalocale/blob/main/docs/express.md for further information.")
             }
         } catch (e) {
 
@@ -327,6 +373,25 @@ function getCurrentMetaAttrs(bundle) {
         Object.keys(bundle?.metadata?.[key]).forEach(k => map.set(k,1));
     })
     return [...map.keys()];
+}
+
+function getBundleKeys(bundle) {
+    var map = new Map();
+    Object.keys((bundle.metadata || {})).forEach(function(key){
+        map.set(key,1)
+    });
+    Object.keys(bundle.library || {}).forEach(function(lang){
+        Object.keys(bundle.library[lang]).forEach(function(key){
+            map.set(key, 1);
+        });
+    });
+    return mapToObject(map);
+}
+
+function mapToObject(m) {
+    var obj = {};
+    [...m].forEach(_ => obj[_[0]] = _[1]);
+    return obj;
 }
 
 program.parse(process.argv);

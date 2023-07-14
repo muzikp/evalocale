@@ -146,13 +146,6 @@ module.exports = function(config = {}) {
         }
     });
 
-    Object.defineProperty(evalocale, "csvToJson", {
-        readonly: true,
-        value: function(csv) {
-
-        }
-    })
-
     /**
      * Derives a secondary metadata package based on the keys in the library. Metadata has the same keys as libraries, but their values are objects with properties defined using the schema argument. Metadata is used for a more precise description of individual language records.
      */
@@ -186,6 +179,9 @@ module.exports = function(config = {}) {
         }
     });
 
+    /**
+     * @deprecated
+     */
     Object.defineProperty(evalocale, "generate", {
         readonly: true,
         value: function(config) {      
@@ -355,10 +351,10 @@ module.exports = function(config = {}) {
     Object.defineProperty(evalocale, "toCSV", {
         readonly: true,
         value: function(delimiter = ";"){
-            var arr = this.toArray();
+            var arr = this.toArray();            
             var str = "";
             str += Object.keys(arr[0]).map(e => `"${e}"`).join(delimiter) + "\n";
-            for(var i = 1; i < arr.length; i++) {
+            for(var i = 0; i < arr.length; i++) {
                 str += Object.keys(arr[0]).map(k => typeof arr[i][k] == "string" ? `"${arr[i][k]}"` : arr[i][k]).join(delimiter) + "\n";            
             }
             return str;        
@@ -369,15 +365,14 @@ module.exports = function(config = {}) {
         readonly: true,
         value: function(content, config = {delimiter: ";", languages: null,autoformat: true}){        
             var headers = content.split(/\n/g)[0].split(config.delimiter).map(e => e.replace(/\"/g,""));        
-            let chunks = content.split(/\n/g).filter((v,i) => i > 0 && v != "");      
-            console.log(chunks);
+            let chunks = content.split(/\n/g).filter((v,i) => i > 0 && v != "");            
             var arr = [];
             for(var ch of chunks) {
                 var o = {};
                 var v = ch.split(config.delimiter).map(e => e.replace(/\"/g,""));
                 for(var h = 0; h < headers.length; h++)
                 {
-                    o[headers[h]] = isNaN(v[h]) ? v[h] : Number(v[h]);
+                    o[headers[h]] = isNaN(v[h]) ? v[h] || "" : Number(v[h]);
                 }            
                 arr.push(o);            
             };        
@@ -402,7 +397,7 @@ module.exports = function(config = {}) {
                     obj[_lh] = (_library?.[_lh] || {})[key]
                 }
                 arr.push(obj);
-            }
+            }            
             return arr;
         }
     });
