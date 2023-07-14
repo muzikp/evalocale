@@ -369,7 +369,8 @@ module.exports = function(config = {}) {
         readonly: true,
         value: function(content, config = {delimiter: ";", languages: null,autoformat: true}){        
             var headers = content.split(/\n/g)[0].split(config.delimiter).map(e => e.replace(/\"/g,""));        
-            let chunks = content.split(/\n/g).filter((v,i) => i > 0 && v != "");                
+            let chunks = content.split(/\n/g).filter((v,i) => i > 0 && v != "");      
+            console.log(chunks);
             var arr = [];
             for(var ch of chunks) {
                 var o = {};

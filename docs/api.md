@@ -1,5 +1,21 @@
 # Evalocale API
 
+## Methods
+
+### alias(nameOrAlias, resolver)
+
+Assigns a custom language code to an existing dictionary.
+
+#### Arguments
+
+**nameOrAlies** {String}
+
+A custom language code want to assign to some dictionary (eg. en-DE).
+
+**resolver** {String | Array<of String> | Function}
+
+Resolver is a way to find the target dictionary. It can be either a string (eg. "en-NZ"), an array of strings (e.g. ["en-NZ", "en-CA"]) or a function (eg. (language) => language.substr(0,2) == "en").
+
 ## Properties
 
 Properties can be get/set by means plain getter/setter, or eventualy by the *set* method (see bellow). Only method marked "both" can be configured via the *set* method.
