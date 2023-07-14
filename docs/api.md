@@ -2,19 +2,33 @@
 
 ## Methods
 
-### alias(nameOrAlias, resolver)
+| **method** | **description** |
+| ---------- | --------------- |
+| [alias](#alias) | Assigns a custom language code to an existing dictionary. |
+| [clean](#clean) | Removes unused codes from the bundle. |
 
-Assigns a custom language code to an existing dictionary.
+### alias
 
-#### Arguments
+Assigns custom language(s) to an existing dictionary.
 
-**nameOrAlies** {String}
+| **param** | **description** | **type** | **required** | **default** |
+| --------- | --------------- | -------- | ------------ | ----------- |
+| nameOrAlias | The code of an existing dictionary to which the resolver will assign user-defined codes. | String | yes | |
+| resolver | Resolver is a way to find the target dictionary. See examples bellow. | String \| Array\<*of String*\> \| Function | yes | |
 
-A custom language code want to assign to some dictionary (eg. en-DE).
+```javascript
+/*
+- prerequisite: you have a $$ instance populated with en-GB dictionary as an example
+*/
+// assigning en-NZ to en-GB; if the user's language is en-NZ, $$ will respond in en-GB
+$$.alias("en-GB", "en-NZ");
+// assigning en-NZ, en-CA, en-US to en-GB; if the user's language is any of en-NZ/en-CA/en-US, $$ will respond in en-GB
+$$.alias("en-GB", ["en-NZ", "en-CA", "en-US"]);
+// assigning any language starting with en to en-GB
+$$.alias("en-GB", (language) => language.substr(0,2) == "en");
+```
 
-**resolver** {String | Array<of String> | Function}
-
-Resolver is a way to find the target dictionary. It can be either a string (eg. "en-NZ"), an array of strings (e.g. ["en-NZ", "en-CA"]) or a function (eg. (language) => language.substr(0,2) == "en").
+### clean
 
 ## Properties
 
