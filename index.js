@@ -460,7 +460,7 @@ const context = function (config = {}) {
     Object.defineProperty(evalocale, "bind", {
         readonly: true,
         value: function(filePath) {
-            if(typeof require == "undefined") throw "Bind method is not supported in the browser environment.";
+            if(typeof require === undefined || typeof require != "function") throw "Bind method is not supported in the browser environment.";
             var fs = eval("require")("fs");
             var format = path.extname(filePath).replace(/\./g,"");
             if(["json","csv"].indexOf(format?.trim().toLowerCase()) < 0) throw "Unsupported file type: " + format;
