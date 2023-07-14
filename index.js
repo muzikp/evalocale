@@ -13,6 +13,13 @@ const path = require('path');
 var parser = require("accept-language-parser");
 var check = require("./intl-check");
 
+/**
+ * @typedef {}
+ */
+
+/**
+ * @returns {Function}
+ */
 const context = function (config = {}) {
     let _library = {};
     let _default = getSystemLocale();
@@ -22,6 +29,13 @@ const context = function (config = {}) {
     let _language;
     const _defaultChars = 8;
 
+    /**
+     * 
+     * @param {*} code 
+     * @param {*} data 
+     * @param {*} language 
+     * @returns 
+     */
     const evalocale = function(code, data = {}, language) {    
         var code = "", data = {}, language, args = [...arguments];
         if(args.length == 0) return this;
@@ -488,8 +502,10 @@ const context = function (config = {}) {
     Object.defineProperty(evalocale, "express", {
         readonly: true,
         value: function(config) {            
-            if(typeof object == "object") {
-                //do the config of expressConfig;
+            if(typeof config == "object") {
+                if(typeof config.callback == "function") {
+                    
+                }
             }
             return function(req, res, next) {
                 if(req.cookies.evalang) {
@@ -498,7 +514,7 @@ const context = function (config = {}) {
                     next();        
                 } else
                 {        
-                    var bestFit = $$.closest(req.get("Accept-Language"));
+                    var bestFit = evalocale.closest(req.get("Accept-Language"));
                     if(bestFit)
                     {
                         req.evalang = bestFit;
@@ -514,7 +530,7 @@ const context = function (config = {}) {
                     var f = function(code, data) {
                         return evalocale(code,data,language)
                     }
-                    f.languages = Object.keys(evalocale.library);
+                    f.languages = Object.keys(evalocale.library);                    
                     f.default = language;
                     f.number = function(value, decimals) {
                         return evalocale.number(value, decimals, language);
