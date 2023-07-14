@@ -7,10 +7,11 @@
 | [alias](#alias) | Assigns a custom language code to an existing dictionary. |
 | [bind](#bind) | Creates a live connection between the evalocale instance and a source file. |
 | [closest](#closest) | Finds the best match of an existing dictionary with the searched language code in the library. |
+| [set](#set) | Sets the content of the instance, like libraries, metadata etc. |
 
 ### alias
 
-Assigns custom language(s) to an existing dictionary. Returns self.
+Assigns custom language(s) to an existing dictionary. In most cases, evolocale can handle language parsing by itself, but to ensure user-defined matching, the alias method is a suitable protection. Returns self.
 
 | **param** | **description** | **type** | **required** | **default** |
 | --------- | --------------- | -------- | ------------ | ----------- |
@@ -43,18 +44,21 @@ var $$ = require("evalocale").bind("./my-app-words.csv");
 
 Returns the key of a dictionary that is closest to the specified value. If no similar language is found, returns either the default or the system language.
 
-The method has a "what" argument, which is the code of the language you're looking for.
+The method has the "what" argument, which is the code of the language you're looking for.
 
 ```javascript
 /*
-- prerequisite: you have a $$ instance populated with en-GB, cs-CZ, cs-SK and sk-SR dictionaries as an example
+- prerequisite: you have a $$ instance populated with en-GB, en-CA, cs-CZ, cs-SK and sk-SR dictionaries as an example
 */
 $$.closest("GB") // => "en-GB"
 $$.closest("en") // => "en-GB"
 $$.closest("sk") // => "sk-SR"
-$$.closest("fr-CA") // => default or system language (as neither fr nor CA found)
+$$.closest("fr-CA") // => "en-CA"
+$$.closest("fr-FR") // => default or system language (as neither fr nor CA found)
 
 ```
+
+### set
 
 ## Properties
 

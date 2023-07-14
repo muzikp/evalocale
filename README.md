@@ -6,8 +6,8 @@ A core library for Node.js and browsers to facilitate dynamic loading of texts i
 
 ## Key features
 
-- easy to setup and use
 - [Node CLI](./docs/cli.md)
+- [live binding](./docs/cli.md###bind) of a source file
 - mustache-like wildcards
 - Node.js + web apps
 - best-fit language lookup
@@ -20,7 +20,7 @@ A core library for Node.js and browsers to facilitate dynamic loading of texts i
 
 Node.js package instalation:
 
-```npm
+```bash
 npm install evalocale
 ```
 
@@ -30,11 +30,56 @@ Browser webpack compiled package installation:
 <script src="./src/evalocale.min.js">
 ```
 
-Mind that the npmjs version might be obsolete so for Node.js rather use
+## Getting started
 
-```npm
-npm install https://github.com/muzikp/evalocale.git
-```
+1. install the package
+
+    ```bash
+    npm i evalocale
+    ```
+
+2. generate a source file from the CLI
+
+    ```bash
+    npx evalocale create -t 100 -m description:string -l en-GB -l es-ES -f csv -n my-words
+    ```
+
+3. Add some data to the file
+
+    Add some data to the source file. I find it more user-friendly to use CSV, to which you can install a graphical extension for your IDE (eg VSCode), but JSON is alright as well. Use {{...custom content}} for dynamic rendering. Wel'll use the example bellow.
+
+    ```csv
+    "_id";"description";"en-GB";"es-ES"
+    "47fmJvio";"welcome";"Welcome to my site";"Bienvenido a mi sitio"
+    "uz8PLDtd";"greeting";"Hello {{who}}";"Hola {{who}}"
+    "oOALYYgl";"human entity";"human";"Hombre"
+    "sn25hwRS";"";"";""
+    "boqkshPL";"";"";""
+    "rMgVzDXZ";"";"";""
+    "903lnKPJ";"";"";""
+    "LgR0Hgnn";"";"";""
+    "6gMViF4p";"";"";""
+    "3BRnGImO";"";"";""
+    "iBdr6oZI";"";"";""
+    ```
+
+4. initialize evalocale instance and bind the file
+
+    ```javasript
+    var evalocale = require("evalocale");
+    var $$ = evalocale().bind("./my-words.csv");
+    //optionally set the default language
+    $$.set("en-GB");
+    ```
+
+5. go for it!
+
+    ```javascript
+    console.log($$("47fmJvio")); // "Welcome to my site" (en-GB is set as default);
+    console.log($$("uz8PLDtd", {who: "John Doe"}, "es")); // "Hola John Doe"
+    console.log($$("uz8PLDtd", {who: $$("oOALYYgl", "es")}, "es")); // "Hola Hombre"
+    console.log($$("uz8PLDtd", {who: $$("oOALYYgl")})); // "Hello human"
+    ```
 
 ## Basic usage
 

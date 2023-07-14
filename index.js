@@ -23,7 +23,20 @@ module.exports = function(config = {}) {
     const _defaultChars = 8;
 
     const evalocale = function(code, data = {}, language) {    
-        if(!code) return "";
+        var code = "", data = {}, language, args = [...arguments];
+        if(args.length == 0) return this;
+        else if(args.length == 1) code = args[0];
+        else if(args.length == 2) {
+            code = args[0];
+            if(typeof args[1] == "object") data = args[1];
+            else if(typeof args[1] == "string") language = args[1];
+            else true;
+        }
+        else if(args.length == 3) {
+            code = args[0];
+            data = args[1];
+            language = args[2];
+        }        
         var _ = dict(language || _default || getSystemLocale());
         if(!_) {
             if(_alertsOn) console.warn(`Dictionary ${language || _default || getSystemLocale()} not found.`);
@@ -125,7 +138,7 @@ module.exports = function(config = {}) {
 
     Object.defineProperty(evalocale, "closest", {
         readonly: true,
-        value: function(what, returnDetail = false) {
+        value: function(what) {
             return guessBestFit(what, false);
         }
     });
