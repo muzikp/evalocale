@@ -13,7 +13,7 @@ const path = require('path');
 var parser = require("accept-language-parser");
 var check = require("./intl-check");
 
-module.exports = function $$(config = {}) {
+const context = function (config = {}) {
     let _library = {};
     let _default = getSystemLocale();
     let _metadata = {};
@@ -629,3 +629,5 @@ module.exports = function $$(config = {}) {
     if(typeof config != "object") return evalocale;
     else return evalocale.set(config);
 };
+
+module.exports = context;
