@@ -447,8 +447,24 @@ module.exports = function(config = {}) {
     Object.defineProperty(evalocale, "bind", {
         readonly: true,
         value: function(filePath) {
+            if(typeof require == "undefined") throw "Bind method is not supported in the browser environment.";
             var fs = eval("require")("fs");
             var format = path.extname(filePath).replace(/\./g,"");
+            if(["json","csv"].indexOf(format?.trim().toLowerCase()) < 0) throw "Unsupported file type: " + format;
+            var c = fs.readFileSync(filePath).toString();
+            if(format == "csv") this.fromCSV(c);
+            else this.load(JSON.parse(c));            
+            fs.watchFile(filePath, (curr, prev) => {                
+                if (curr.mtime > prev.mtime) {      
+                    try {      
+                        this.bind(filePath);                        
+                        if(_alertsOn) console.log("Data updated");
+                    } catch(e) {
+                        console.warn(e);
+                    }
+                }
+            });
+            return this;
         }
     })
 

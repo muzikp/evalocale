@@ -5,11 +5,12 @@
 | **method** | **description** |
 | ---------- | --------------- |
 | [alias](#alias) | Assigns a custom language code to an existing dictionary. |
-| [clean](#clean) | Removes unused codes from the bundle. |
+| [bind](#bind) | Creates a live connection between the evalocale instance and a source file. |
+| [closest](#closest) | Finds the best match of an existing dictionary with the searched language code in the library. |
 
 ### alias
 
-Assigns custom language(s) to an existing dictionary.
+Assigns custom language(s) to an existing dictionary. Returns self.
 
 | **param** | **description** | **type** | **required** | **default** |
 | --------- | --------------- | -------- | ------------ | ----------- |
@@ -28,9 +29,32 @@ $$.alias("en-GB", ["en-NZ", "en-CA", "en-US"]);
 $$.alias("en-GB", (language) => language.substr(0,2) == "en");
 ```
 
-### clean
+### bind
 
-Removes unused keys from dictionaries and metadata.
+It connects the source file (csv or json) to the evalocale instance and at the same time monitors the changes in the source file and takes them into account in its outputs in real time (or with minimal latency depending on the size of the file). This method therefore allows you to make changes to dictionaries in v without having to restart the application.
+
+The method has *filePath* argument and is accessible from the Node.js environment only. Returns self.
+
+```javascript
+var $$ = require("evalocale").bind("./my-app-words.csv");
+```
+
+### closest
+
+Returns the key of a dictionary that is closest to the specified value. If no similar language is found, returns either the default or the system language.
+
+The method has a "what" argument, which is the code of the language you're looking for.
+
+```javascript
+/*
+- prerequisite: you have a $$ instance populated with en-GB, cs-CZ, cs-SK and sk-SR dictionaries as an example
+*/
+$$.closest("GB") // => "en-GB"
+$$.closest("en") // => "en-GB"
+$$.closest("sk") // => "sk-SR"
+$$.closest("fr-CA") // => default or system language (as neither fr nor CA found)
+
+```
 
 ## Properties
 
