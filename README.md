@@ -1,13 +1,11 @@
 # Evalocale
 
-A core library for Node.js and browsers to facilitate dynamic loading of texts in different languages.
-
-## **THIS PACKAGE IS UNDER DEVELOPMENT AND IS FOR EXPERIMENTAL PURPOSES ONLY UNTIL FURTHER NOTICE**
+A library for Node.js and browsers to facilitate dynamic loading of texts in different languages.
 
 ## Key features
 
 - [Node CLI](./docs/cli.md)
-- [live binding](./docs/cli.md###bind) of a source file
+- [live binding](./docs/api.md###bind) of a source file
 - mustache-like wildcards
 - Node.js + web apps
 - best-fit language lookup
@@ -46,22 +44,21 @@ Browser webpack compiled package installation:
 
 3. Add some data to the file
 
-    Add some data to the source file. I find it more user-friendly to use CSV, to which you can install a graphical extension for your IDE (eg VSCode), but JSON is alright as well. Use {{...custom content}} for dynamic rendering. Wel'll use the example bellow.
+    Add some data to the source file. I find it more user-friendly to use CSV, to which you can install a GUI for your IDE (eg VSCode), but JSON is alright as well. Use {{...custom content}} for dynamic rendering. Wel'll use the example bellow (rendered CSV).
 
-    ```csv
-    "_id";"description";"en-GB";"es-ES"
-    "47fmJvio";"welcome";"Welcome to my site";"Bienvenido a mi sitio"
-    "uz8PLDtd";"greeting";"Hello {{who}}";"Hola {{who}}"
-    "oOALYYgl";"human entity";"human";"Hombre"
-    "sn25hwRS";"";"";""
-    "boqkshPL";"";"";""
-    "rMgVzDXZ";"";"";""
-    "903lnKPJ";"";"";""
-    "LgR0Hgnn";"";"";""
-    "6gMViF4p";"";"";""
-    "3BRnGImO";"";"";""
-    "iBdr6oZI";"";"";""
-    ```
+    | _id      | description   | en-GB                  | es-ES                 |
+    |----------|---------------|------------------------|-----------------------|
+    | 47fmJvio | welcome       | Welcome to my site     | Bienvenido a mi sitio |
+    | uz8PLDtd | greeting      | Hello {{who}}          | Hola {{who}}          |
+    | oOALYYgl | human entity  | human                  | Hombre                |
+    | sn25hwRS |                |                        |                       |
+    | boqkshPL |                |                        |                       |
+    | rMgVzDXZ |                |                        |                       |
+    | 903lnKPJ |                |                        |                       |
+    | LgR0Hgnn |                |                        |                       |
+    | 6gMViF4p |                |                        |                       |
+    | 3BRnGImO |                |                        |                       |
+    | iBdr6oZI |                |                        |                       |
 
 4. initialize evalocale instance and bind the file
 
